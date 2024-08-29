@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 # 매크로 변수 설정
 set(WINDOW_NAME "PBR Renderer")
-set(WINDOW_WIDTH 800)
-set(WINDOW_HEIGHT 600)
+set(WINDOW_WIDTH 1280)
+set(WINDOW_HEIGHT 720)
 
 # FetchContent 모듈 포함
 include(FetchContent)
