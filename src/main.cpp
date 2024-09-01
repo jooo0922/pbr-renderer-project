@@ -1,6 +1,4 @@
-#include <glad/glad.h>  // 운영체제(플랫폼)별 OpenGL 함수를 함수 포인터에 저장 및 초기화 (OpenGL 을 사용하는 다른 라이브러리(GLFW)보다 먼저 include 할 것.)
-#include <GLFW/glfw3.h> // OpenGL 컨텍스트 생성, 윈도우 생성, 사용자 입력 처리 관련 OpenGL 라이브러리
-#include <algorithm>    // std::min(), std::max() 를 사용하기 위해 포함한 라이브러리
+#include <algorithm> // std::min(), std::max() 를 사용하기 위해 포함한 라이브러리
 
 // 이미지 파일 로드 라이브러리 include (관련 설명 하단 참고)
 #define STB_IMAGE_IMPLEMENTATION
@@ -13,23 +11,12 @@
 
 #include "shader/shader.hpp"
 #include "camera/camera.hpp"
+#include "glfw_impl/glfw_impl.hpp"
 
 #include <iostream>
 #include <spdlog/spdlog.h>
 
 /* 콜백함수 전방선언 */
-
-// GLFW 윈도우 크기 변경 감지 시, 호출할 콜백함수
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-
-// GLFW 윈도우에 마우스 입력 감지 시, 호출할 콜백함수
-void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-
-// GLFW 윈도우에 스크롤 입력 감지 시, 호출할 콜백함수
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-
-// GLFW 윈도우 및 키 입력 감지 및 이에 대한 반응 처리 함수 선언
-void processInput(GLFWwindow *window);
 
 // 텍스쳐 이미지 로드 및 객체 생성 함수 선언 (텍스쳐 객체 참조 id 반환)
 unsigned int loadTexture(const char *path);
@@ -43,86 +30,21 @@ void renderCube();
 // QuadMesh 렌더링 함수 선언
 void renderQuad();
 
-// 카메라 클래스 생성 (카메라 위치값만 매개변수로 전달함.)
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
-// 가장 최근 마우스 입력 좌표값을 스크린 좌표의 중점으로 초기화
-float lastX = WINDOW_WIDTH / 2.0f;
-float lastY = WINDOW_HEIGHT / 2.0f;
-
-// 첫 번째 마우스 입력 여부를 나타내는 상태값 > 첫 번째 마우스 입력에 대한 예외처리 목적
-bool firstMouse = true;
-
-// 카메라 이동속도 보정에 사용되는 deltaTime 변수 선언 및 초기화
-float deltaTime = 0.0f; // 마지막에 그려진 프레임 ~ 현재 프레임 사이의 시간 간격
-float lastFrame = 0.0f; // 마지막에 그려진 프레임의 ElapsedTime(경과시간)
-
 int main()
 {
   // 앱 시작
   spdlog::info("Starting the application");
 
-  // GLFW 초기화
-  if (!glfwInit())
+  // 카메라 클래스 생성 (카메라 위치값만 매개변수로 전달함.)
+  Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+  // GLFWImpl 객체 생성
+  GLFWImpl glfwImpl(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, &camera);
+
+  // GLFWImpl 초기화
+  if (glfwImpl.init() != 0)
   {
-    spdlog::error("Failed to initialize GLFW");
-    return -1;
-  };
-
-  /* GLFW 윈도우(창) 설정 구성 */
-
-  // GLFW 에게 OpenGL 3.3 버전 사용 명시
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-  // GLFW 에게 core-profile 버전 사용 명시 (Core-profile vs Immediate mode 비교글 참고)
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  // macos 를 지칭하는 매크로 __APPLE__ 전처리기 존재 여부를 통해
-  // 현재 운영체제가 macos 일 경우, 미래 버전의 OpenGL 을 사용해서 GLFW 창을 생성하도록 함. (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
-  // 이를 통해, macos 에서 실행되는 OpenGL 버전 호환성 문제를 해결함.
-#ifdef __APPLE__
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-  // GLFW 윈도우 생성 (윈도우 높이, 너비, 윈도우창 제목, 풀스크린 모드/창모드, 컨텍스트 리소스를 공유할 또 다른 윈도우)
-  spdlog::info("Create GLFW Window");
-  GLFWwindow *window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, NULL, NULL);
-  if (window == NULL)
-  {
-    // GLFW 윈도우 생성 실패(null 체크) 시 예외 처리
-    spdlog::error("Failed to create GLFW window");
-
-    // 현재 남아있는 glfw 윈도우 제거, 리소스 메모리 해제, 라이브러리 초기화 이전 상태로 되돌림.
-    // glfwInit() 과 반대 역할!
-    glfwTerminate();
-
-    return -1;
-  }
-
-  // 새로운 GLFWwindow 윈도우 객체를 만들면, 해당 윈도우의 OpenGL 컨텍스트를 현재 실행중인 스레드의 현재 컨텍스트로 지정
-  glfwMakeContextCurrent(window);
-
-  /* GLFWwindow 에 콜백함수 등록 */
-
-  // GLFWwindow 창 크기 변경(resize) 감지 시, 발생시킬 리사이징 콜백함수 등록 (콜백함수는 항상 게임루프 시작 전 등록!)
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-  // GLFWwindow 에 마우스 커서 입력 감지 시, 발생시킬 콜백함수 등록
-  glfwSetCursorPosCallback(window, mouse_callback);
-
-  // GLFWwindow 에 마우스 스크롤 입력 감지 시, 발생시킬 콜백함수 등록
-  glfwSetScrollCallback(window, scroll_callback);
-
-  // 마우스 커서 입력에 대한 설정을 지정
-  // GLFW_CURSOR_DISABLED 로 커서 입력을 설정할 경우,
-  // 마우스 이동 시, 커서를 보이지 않게 함과 동시에, 마우스 커서 위치가 window 창 범위를 벗어나지 않도록(capture) 함
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-  // GLAD 로 런타임에 각 운영체제에 걸맞는 OpenGL 함수 포인터 초기화 및 실패 시 예외 처리.
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-  {
-    spdlog::error("Failed to initialized glad");
+    spdlog::error("Failed to initialize GLFWImpl");
     return -1;
   }
 
@@ -665,33 +587,13 @@ int main()
   // 계산된 투영행렬을 쉐이더 프로그램에 전송
   backgroundShader.setMat4("projection", projection);
 
-  /* 기본 프레임버퍼 렌더링 루프 진입 이전에 해상도 복구 */
-
-  // 해상도 값을 담을 변수 선언 (원래는 포인터 변수로 선언해야 함.)
-  int scrWidth, scrHeight;
-
-  // 현재 GLFWwindow 객체의 프레임버퍼 해상도를 두 int 타입 포인터 변수에 저장 -> 함수 외부 변수의 주소값을 넘겨줬으니, 포인터와 마찬가지!
-  glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
-
-  // 기본 프레임버퍼 해상도 복구
-  glViewport(0, 0, scrWidth, scrHeight);
+  glfwImpl.restoreViewport();
 
   // while 문으로 렌더링 루프 구현
-  while (!glfwWindowShouldClose(window))
+  while (!glfwImpl.shouldClose())
   {
-    /* 카메라 이동속도 보정을 위한 deltaTime 계산 */
-
-    // 현재 프레임 경과시간
-    float currentFrame = static_cast<float>(glfwGetTime());
-
-    // 현재 프레임 경과시간 - 마지막 프레임 경과시간 = 두 프레임 사이의 시간 간격
-    deltaTime = currentFrame - lastFrame;
-
-    // 마지막 프레임 경과시간을 현재 프레임 경과시간으로 업데이트!
-    lastFrame = currentFrame;
-
-    // 윈도우 창 및 키 입력 감지 밎 이벤트 처리
-    processInput(window);
+    // 렌더링 루프에서의 glfw 처리
+    glfwImpl.process();
 
     // 현재까지 저장되어 있는 프레임 버퍼(그 중에서도 색상 버퍼) 초기화하기
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -789,7 +691,7 @@ int main()
     for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
     {
       // 시간에 따라 각 광원을 x 축 방향으로 [-5, 5] 범위 내에서 이동시키기 위한 위치값 재계산
-      glm::vec3 newPos = lightPositions[i] + glm::vec3(std::sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+      glm::vec3 newPos = lightPositions[i] + glm::vec3(std::sin(glfwImpl.getTime() * 5.0) * 5.0, 0.0, 0.0);
 
       // 광원 위치를 이동시키고 싶다면 아래의 기존 위치 재할당 코드 주석 처리
       newPos = lightPositions[i];
@@ -826,91 +728,14 @@ int main()
     // brdfShader.use();
     // renderQuad();
 
-    // Double Buffer 상에서 Back Buffer 에 픽셀들이 모두 그려지면, Front Buffer 와 교체(swap)해버림.
-    glfwSwapBuffers(window);
-
-    // 키보드, 마우스 입력 이벤트 발생 검사 후 등록된 콜백함수 호출 + 이벤트 발생에 따른 GLFWwindow 상태 업데이트
-    glfwPollEvents();
+    glfwImpl.swapBuffers();
+    glfwImpl.pollEvents();
   }
-
-  // while 렌더링 루프 탈출 시, GLFWwindow 종료 및 리소스 메모리 해제
-  glfwTerminate();
 
   return 0;
 }
 
 // 전방선언된 콜백함수 정의
-// GLFWwindow 윈도우 창 리사이징 감지 시, 호출할 콜백 함수 정의
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
-  glViewport(0, 0, width, height); // GLFWwindow 상에 렌더링될 뷰포트 영역을 정의. (뷰포트 영역의 좌상단 좌표, 뷰포트 영역의 너비와 높이)
-}
-
-// GLFW 윈도우에 마우스 입력 감지 시, 호출할 콜백함수 정의
-void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
-{
-  // 콜백함수의 매개변수로 전달받는 마우스 좌표값의 타입을 double > float 으로 형변환
-  float xpos = static_cast<float>(xposIn);
-  float ypos = static_cast<float>(yposIn);
-
-  if (firstMouse)
-  {
-    // 맨 처음 전달받은 마우스 좌표값은 초기에 설정된 lastX, Y 와 offset 차이가 심할 것임.
-    // 이 offset 으로 yaw, pitch 변화를 계산하면 회전이 급격하게 튀다보니,
-    // 맨 처음 전달받은 마우스 좌표값으로는 offset 을 계산하지 않고, lastX, Y 값을 업데이트 하는 데에만 사용함.
-    lastX = xpos;
-    lastY = ypos;
-    firstMouse = false;
-  }
-
-  // 마지막 프레임의 마우스 좌표값에서 현재 프레임의 마우스 좌표값까지 이동한 offset 계산
-  float xoffset = xpos - lastX;
-  float yoffset = lastY - ypos; // y축 좌표는 스크린좌표계와 3D 좌표계(오른손 좌표계)와 방향이 반대이므로, -(ypos - lastY) 와 같이 뒤집어준 것!
-
-  // 마지막 프레임의 마우스 좌표값 갱신
-  lastX = xpos;
-  lastY = ypos;
-
-  // 마우스 이동량(offset)에 따른 카메라 오일러 각 재계산 및 카메라 로컬 축 벡터 업데이트
-  camera.ProcessMouseMovement(xoffset, yoffset);
-}
-
-// GLFW 윈도우에 스크롤 입력 감지 시, 호출할 콜백함수 정의
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
-{
-  // 마우스 수직방향 스크롤 이동량(yoffset)에 따른 카메라 zoom 값 재계산
-  camera.ProcessMouseScroll(yoffset);
-}
-
-// GLFWwindow 윈도우 입력 및 키 입력 감지 후 이벤트 처리 함수 (렌더링 루프에서 반복 감지)
-void processInput(GLFWwindow *window)
-{
-  // 현재 GLFWwindow 에 대하여(활성화 시,) 특정 키(esc 키)가 입력되었는지 여부를 감지
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-  {
-    glfwSetWindowShouldClose(window, true); // GLFWwindow 의 WindowShouldClose 플래그(상태값)을 true 로 설정 -> main() 함수의 while 조건문에서 렌더링 루프 탈출 > 렌더링 종료!
-  }
-
-  // 카메라 이동속도 보정 (기본 속도 2.5 가 어느 컴퓨터에서든 유지될 수 있도록 deltaTime 값으로 속도 보정)
-  float cameraSpeed = static_cast<float>(2.5 * deltaTime);
-
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-  {
-    camera.ProcessKeyboard(FORWARD, deltaTime); // 키 입력에 따른 카메라 이동 처리 (GLFW 키 입력 메서드에 독립적인 enum 사용)
-  }
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-  {
-    camera.ProcessKeyboard(BACKWARD, deltaTime); // 키 입력에 따른 카메라 이동 처리 (GLFW 키 입력 메서드에 독립적인 enum 사용)
-  }
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-  {
-    camera.ProcessKeyboard(LEFT, deltaTime); // 키 입력에 따른 카메라 이동 처리 (GLFW 키 입력 메서드에 독립적인 enum 사용)
-  }
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-  {
-    camera.ProcessKeyboard(RIGHT, deltaTime); // 키 입력에 따른 카메라 이동 처리 (GLFW 키 입력 메서드에 독립적인 enum 사용)
-  }
-}
 
 /* 구체 렌더링 함수 구현 */
 
