@@ -37,6 +37,7 @@ target_sources(${PROJECT_NAME} PRIVATE
   ${CMAKE_SOURCE_DIR}/src/glad.c
   ${CMAKE_SOURCE_DIR}/src/shader/shader.cpp
   ${CMAKE_SOURCE_DIR}/src/camera/camera.cpp
+  ${CMAKE_SOURCE_DIR}/src/glfw_impl/glfw_impl.cpp
 )
 
 # 타겟에 라이브러리 링크
