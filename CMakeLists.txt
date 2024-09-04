@@ -31,8 +31,13 @@ FetchContent_MakeAvailable(glfw)
 # 실행 파일 정의
 add_executable(${PROJECT_NAME} src/main.cpp)
 
-# 타겟에 glad 파일 추가
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+# 헤더 파일 및 3rd party 디렉토리 추가
+target_include_directories(${PROJECT_NAME} PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/3rdparty
+)
+
+# 타겟에 glad 및 소스 파일 추가
 target_sources(${PROJECT_NAME} PRIVATE
   ${CMAKE_SOURCE_DIR}/src/glad.c
   ${CMAKE_SOURCE_DIR}/src/shader/shader.cpp
