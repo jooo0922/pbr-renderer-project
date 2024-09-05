@@ -25,11 +25,11 @@ public:
 
   GLuint getID() const;
 
-  void bind() const;
+  void bind() const override;
 
-  void unbind() const;
+  void unbind() const override;
 
-  void destroy();
+  void destroy() override;
 
 private:
   GLuint ID;
