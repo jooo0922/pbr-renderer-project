@@ -28,7 +28,7 @@ public:
   // interleaved buffer 구조를 고려하여 VBO 객체 연결 함수 구현
   void linkVBO(const VertexBufferObject &vbo, const std::vector<std::tuple<GLuint, GLint, GLenum, GLboolean, GLsizei, const void *>> &attributes);
 
-  void linIBO(const IndexBufferObject &ibo);
+  void linkIBO(const IndexBufferObject &ibo);
 
   GLuint getID() const;
 

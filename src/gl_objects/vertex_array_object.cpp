@@ -41,7 +41,7 @@ void VertexArrayObject::linkVBO(const VertexBufferObject &vbo, const std::vector
   unbind();
 }
 
-void VertexArrayObject::linIBO(const IndexBufferObject &ibo)
+void VertexArrayObject::linkIBO(const IndexBufferObject &ibo)
 {
   bind();
   ibo.bind();
