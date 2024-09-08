@@ -20,9 +20,6 @@ public:
    */
   virtual ~IGLObject() = default;
 
-  // gl object 초기화
-  virtual void initialize() = 0;
-
   // gl object 바인딩
   virtual void bind() const = 0;
 
