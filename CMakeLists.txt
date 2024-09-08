@@ -37,13 +37,17 @@ target_include_directories(${PROJECT_NAME} PRIVATE
   ${CMAKE_SOURCE_DIR}/3rdparty
 )
 
-# 타겟에 glad 및 소스 파일 추가
-target_sources(${PROJECT_NAME} PRIVATE
-  ${CMAKE_SOURCE_DIR}/src/glad.c
-  ${CMAKE_SOURCE_DIR}/src/shader/shader.cpp
-  ${CMAKE_SOURCE_DIR}/src/camera/camera.cpp
-  ${CMAKE_SOURCE_DIR}/src/glfw_impl/glfw_impl.cpp
-)
+# src/... 하위의 *.cpp 파일들을 재귀적으로 검색하여 찾기
+file(GLOB_RECURSE CPP_SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
+
+# glad.c 소스 파일을 명시하는 변수 설정
+set(C_SOURCES ${CMAKE_SOURCE_DIR}/src/glad.c)
+
+# C++ 및 C 소스 파일 목록을 결합하여 변수로 설정
+set(SOURCE_FILES ${C_SOURCES} ${CPP_SOURCES})
+
+# 타겟에 소스 파일 추가
+target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
 # 타겟에 라이브러리 링크
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw spdlog)
