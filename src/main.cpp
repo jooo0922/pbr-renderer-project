@@ -23,9 +23,6 @@
 // 텍스쳐 이미지 로드 및 객체 생성 함수 선언 (텍스쳐 객체 참조 id 반환)
 unsigned int loadTexture(const char *path);
 
-// 큐브 렌더링 함수 선언
-void renderCube();
-
 // QuadMesh 렌더링 함수 선언
 void renderQuad();
 
