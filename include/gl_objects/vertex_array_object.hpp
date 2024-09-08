@@ -7,9 +7,9 @@
 */
 
 #include <glad/glad.h> // OpenGL 함수를 초기화하기 위한 헤더
-#include <gl_object.hpp>
-#include <vertex_buffer_object.hpp>
-#include <index_buffer_object.hpp>
+#include <gl_objects/gl_object.hpp>
+#include <gl_objects/vertex_buffer_object.hpp>
+#include <gl_objects/index_buffer_object.hpp>
 #include <vector>
 #include <tuple>
 

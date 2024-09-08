@@ -7,7 +7,7 @@
 */
 
 #include <glad/glad.h> // OpenGL 함수를 초기화하기 위한 헤더
-#include <gl_object.hpp>
+#include <gl_objects/gl_object.hpp>
 
 /**
  * IndexBufferObject 클래스
