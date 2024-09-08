@@ -13,6 +13,7 @@
 #include "camera/camera.hpp"
 #include "glfw_impl/glfw_impl.hpp"
 #include "renderable_objects/sphere.hpp"
+#include "renderable_objects/cube.hpp"
 
 #include <iostream>
 #include <spdlog/spdlog.h>
@@ -130,6 +131,9 @@ int main()
 
   // Sphere 객체 생성
   Sphere sphere;
+
+  // Cube 객체 생성
+  Cube cube;
 
   // 각 구체의 모델 행렬 계산 시 사용할 구체의 행 수, 열 수, 간격값 초기화
   int nrRows = 7;
@@ -290,7 +294,7 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // 단위 큐브 렌더링 -> Point Shadow 에서는 Cubemap 버퍼 각 면에 렌더링해주는 작업을 geometry shader 에서 처리해줬었지!
-    renderCube();
+    cube.draw(equirectangularToCubemapShader);
   }
 
   // Cubemap 버퍼에 렌더링 완료 후, 기본 프레임버퍼로 바인딩 초기화
@@ -385,7 +389,7 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // 단위 큐브 렌더링 -> irradianceShader 에서 적분식을 풀면서 각 프래그먼트 지점의 irradiance 를 Cubemap 버퍼에 저장함.
-    renderCube();
+    cube.draw(irradianceShader);
   }
 
   // Cubemap 버퍼에 렌더링 완료 후, 기본 프레임버퍼로 바인딩 초기화
@@ -504,7 +508,7 @@ int main()
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       // 단위 큐브 렌더링 -> prefilterShader 에서 split sum approximation 의 첫 번째 적분식의 결과값을 풀어 Cubemap 버퍼에 저장함.
-      renderCube();
+      cube.draw(prefilterShader);
     }
   }
 
@@ -725,7 +729,7 @@ int main()
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
     // skybox 렌더링
-    renderCube();
+    cube.draw(backgroundShader);
 
     // BRDF Integration map 을 실제로 화면에 렌더링해서 제대로 생성되었는지 확인
     // brdfShader.use();
@@ -739,120 +743,6 @@ int main()
 }
 
 // 전방선언된 콜백함수 정의
-
-/* 큐브 렌더링 함수 구현 */
-
-// Cube VBO, VAO 객체(object) 참조 id 를 저장할 변수 전역 선언 (why? 다른 함수들에서도 참조)
-unsigned int cubeVAO = 0;
-unsigned int cubeVBO = 0;
-
-void renderCube()
-{
-  /*
-    VAO 참조 ID 가 아직 할당되지 않았을 경우,
-    큐브의 VAO(Vertex Array Object), VBO(Vertex Buffer Object) 생성 및 바인딩(하단 VAO 관련 필기 참고)
-  */
-  if (cubeVAO == 0)
-  {
-    // 큐브의 정점 데이터 정적 배열 초기화
-    float vertices[] = {
-        // back face
-        -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-        1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,   // top-right
-        1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,  // bottom-right
-        1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,   // top-right
-        -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-        -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,  // top-left
-        // front face
-        -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom-left
-        1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  // bottom-right
-        1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,   // top-right
-        1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,   // top-right
-        -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,  // top-left
-        -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom-left
-        // left face
-        -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   // top-right
-        -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // top-left
-        -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom-left
-        -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom-left
-        -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,  // bottom-right
-        -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   // top-right
-                                                            // right face
-        1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,     // top-left
-        1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,   // bottom-right
-        1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,    // top-right
-        1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,   // bottom-right
-        1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,     // top-left
-        1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,    // bottom-left
-        // bottom face
-        -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, // top-right
-        1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,  // top-left
-        1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,   // bottom-left
-        1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,   // bottom-left
-        -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  // bottom-right
-        -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, // top-right
-        // top face
-        -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top-left
-        1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // bottom-right
-        1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,  // top-right
-        1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // bottom-right
-        -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top-left
-        -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f   // bottom-left
-    };
-
-    // VAO(Vertex Array Object) 객체 생성
-    glGenVertexArrays(1, &cubeVAO);
-
-    // VBO(Vertex Buffer Object) 객체 생성
-    glGenBuffers(1, &cubeVBO);
-
-    // VAO 객체 먼저 컨텍스트에 바인딩(연결)함.
-    // -> 그래야 재사용할 여러 개의 VBO 객체들 및 설정 상태를 바인딩된 VAO 에 저장할 수 있음.
-    glBindVertexArray(cubeVAO);
-
-    // VBO 객체는 GL_ARRAY_BUFFER 타입의 버퍼 유형 상태에 바인딩되어야 함.
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-
-    // 실제 정점 데이터를 생성 및 OpenGL 컨텍스트에 바인딩된 VBO 객체에 덮어씀.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // 원래 버텍스 쉐이더의 모든 location 의 attribute 변수들은 사용 못하도록 디폴트 설정이 되어있음.
-    // -> 그 중에서 0번 location 변수를 사용하도록 활성화
-    glEnableVertexAttribArray(0);
-
-    // 정점 위치 데이터(0번 location 입력변수 in vec3 aPos 에 전달할 데이터) 해석 방식 정의
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-
-    // 1번 location 변수를 사용하도록 활성화
-    glEnableVertexAttribArray(1);
-
-    // 정점 노멀 데이터(1번 location 입력변수 in vec3 aNormal 에 전달할 데이터) 해석 방식 정의
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-
-    // 2번 location 변수를 사용하도록 활성화
-    glEnableVertexAttribArray(2);
-
-    // 정점 UV 데이터(2번 location 입력변수 in vec2 aTexCoords 에 전달할 데이터) 해석 방식 정의
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-
-    // VBO 객체 설정을 끝마쳤으므로, OpenGL 컨텍스트로부터 바인딩 해제
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // 마찬가지로, VAO 객체도 OpenGL 컨텍스트로부터 바인딩 해제
-    glBindVertexArray(0);
-  }
-
-  /* 큐브 그리기 */
-
-  // 큐브에 적용할 VAO 객체를 바인딩하여, 해당 객체에 저장된 VBO 객체와 설정대로 그리도록 명령
-  glBindVertexArray(cubeVAO);
-
-  // 큐브 그리기 명령
-  glDrawArrays(GL_TRIANGLES, 0, 36);
-
-  // 그리기 명령 종료 후, VAO 객체 바인딩 해제
-  glBindVertexArray(0);
-}
 
 /* BRDF Integration map 로 생성할 QuadMesh 를 렌더링하는 함수 구현 */
 
@@ -917,10 +807,10 @@ void renderQuad()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
 
     // 1번 location 변수를 사용하도록 활성화
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
     // 정점 UV 데이터(1번 location 입력변수 in vec2 aTexCoords 에 전달할 데이터) 해석 방식 정의
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
 
     // VBO 객체 설정을 끝마쳤으므로, OpenGL 컨텍스트로부터 바인딩 해제
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1012,31 +902,6 @@ unsigned int loadTexture(const char *path)
 
   요렇게 전처리기가 정의되어 있는 부분이 있음.
   이 부분의 코드들만 include 하겠다는 것이지!
-*/
-
-/*
-  VAO 는 왜 만드는걸까?
-
-  VBO 객체를 생성 및 바인딩 후,
-  해당 버퍼에 정점 데이터를 쓰고,
-  버퍼에 쓰여진 데이터를 버텍스 쉐이더의 몇번 location 의 변수에서 사용할 지,
-  해당 데이터를 몇 묶음으로 해석할 지 등의 해석 방식을 정의하고,
-  해당 버퍼에 쓰여진 데이터를 사용하는 location 의 변수를 활성화하는 등의 작업은 이해가 가지?
-
-  모두 GPU 메모리 상에 저장된 정점 버퍼의 데이터를
-  버텍스 쉐이더가 어떻게 가져다 쓸 지 정의하기 위한 과정이지.
-
-  그런데, 만약 서로 다른 오브젝트가 100개 존재하고,
-  각 오브젝트에 5개의 vertex attribute 를 사용한다면?
-  이런 식으로 VBO 를 구성하고 데이터 해석 방식을 설정하는 작업을
-  그리기 명령이 발생할 때마다 500번씩 매번 해야된다는 소리...
-
-  그런데, VAO 객체를 사용하면, 거기에다가
-  VAO 안에 VBO 객체와 데이터 해석 방식, 해당 location 변수 활성화 여부 등의
-  설정 상태를 모두 저장해두고 그리기 명령을 호출할 때마다
-  필요한 VAO 객체를 교체하거나 꺼내쓸 수 있다.
-
-  즉, 저런 번거로운 VBO 객체 생성 및 설정 작업을 반복하지 않아도 된다는 뜻!
 */
 
 /*
