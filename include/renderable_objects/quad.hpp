@@ -8,7 +8,7 @@
 
 #include "renderable_objects/primitive.hpp"
 
-class Quad : public Primitive
+class Quad final : public Primitive
 {
 public:
   // 생성자

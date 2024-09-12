@@ -14,7 +14,7 @@
  *
  * IBO 객체를 추상화한 클래스
  */
-class IndexBufferObject : public IGLObject
+class IndexBufferObject final : public IGLObject
 {
 public:
   IndexBufferObject();

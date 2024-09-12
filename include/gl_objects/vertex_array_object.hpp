@@ -18,7 +18,7 @@
  *
  * VAO 객체를 추상화한 클래스
  */
-class VertexArrayObject : public IGLObject
+class VertexArrayObject final : public IGLObject
 {
 public:
   VertexArrayObject();
