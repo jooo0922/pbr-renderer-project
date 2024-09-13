@@ -15,14 +15,10 @@
 #include "renderable_objects/sphere.hpp"
 #include "renderable_objects/cube.hpp"
 #include "renderable_objects/quad.hpp"
+#include "gl_objects/texture.hpp"
 
 #include <iostream>
 #include <spdlog/spdlog.h>
-
-/* 콜백함수 전방선언 */
-
-// 텍스쳐 이미지 로드 및 객체 생성 함수 선언 (텍스쳐 객체 참조 id 반환)
-unsigned int loadTexture(const char *path);
 
 int main()
 {
@@ -157,51 +153,8 @@ int main()
   // FBO 객체에 생성한 RBO 객체 attach
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
 
-  /* stb_image 라이브러리로 .hdr 파일 로드하여 텍스쳐 객체 생성 */
-
-  // 텍스쳐 이미지 로드 후, y축 방향으로 뒤집어 줌 > OpenGL 이 텍스쳐 좌표를 읽는 방향과 이미지의 픽셀 좌표가 반대라서!
-  stbi_set_flip_vertically_on_load(true);
-
-  // 로드한 .hdr 이미지의 width, height, 색상 채널 개수를 저장할 변수 선언
-  int width, height, nrComponents;
-
-  // 이미지 데이터 가져와서 float 타입의 bytes 데이터로 저장.
-  // 이미지 width, height, 색상 채널 변수의 주소값도 넘겨줌으로써, 해당 함수 내부에서 값을 변경. -> 출력변수 역할
-  float *data = stbi_loadf("resources/textures/hdr/newport_loft.hdr", &width, &height, &nrComponents, 0);
-
-  // 텍스쳐 객체(object) 참조 id 를 저장할 변수 선언
-  unsigned int hdrTexture;
-
-  if (data)
-  {
-    // 텍스쳐 객체 생성 및 바인딩
-    glGenTextures(1, &hdrTexture);
-    glBindTexture(GL_TEXTURE_2D, hdrTexture);
-
-    /*
-      [0, 1] 범위를 넘어선 HDR 이미지 데이터(data)들을 온전히 저장하기 위해,
-      GL_RGB16F floating point(부동 소수점) 포맷으로 프레임버퍼의 내부 색상 포맷 지정
-      (하단 Floating point framebuffer 관련 필기 참고)
-    */
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
-
-    // 현재 GL_TEXTURE_2D 상태에 바인딩된 텍스쳐 객체 설정하기
-    // Texture Wrapping 모드를 반복 모드로 설정 ([(0, 0), (1, 1)] 범위를 벗어나는 텍스쳐 좌표에 대한 처리)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    // 텍스쳐 축소/확대 및 Mipmap 교체 시 Texture Filtering (텍셀 필터링(보간)) 모드 설정
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // 텍스쳐 객체에 이미지 데이터를 전달하고, 밉맵까지 생성 완료했다면, 로드한 이미지 데이터는 항상 메모리 해제할 것!
-    stbi_image_free(data);
-  }
-  else
-  {
-    // HDR 이미지 데이터 로드 실패 시 처리
-    spdlog::error("Failed to load HDR image.");
-  }
+  /* .hdr 이미지 로드하여 텍스쳐 객체 생성 */
+  Texture hdrTexture("resources/textures/hdr/newport_loft.hdr", GL_RGB16F, GL_RGB);
 
   /* HDR 이미지 텍스쳐를 렌더링할 color buffer 로써 Cubemap 텍스쳐 객체 생성 */
 
@@ -265,11 +218,8 @@ int main()
   // fov(시야각)이 90로 고정된 투영행렬 전송
   equirectangularToCubemapShader.setMat4("projection", captureProjection);
 
-  // HDR 이미지 텍스쳐를 바인딩할 0번 texture unit 활성화
-  glActiveTexture(GL_TEXTURE0);
-
-  // 0번 texture unit 에 HDR 이미지 텍스쳐 바인딩
-  glBindTexture(GL_TEXTURE_2D, hdrTexture);
+  // HDR 이미지 텍스쳐를 0번 texture unit 에 바인딩해서 사용
+  hdrTexture.use(GL_TEXTURE0);
 
   /* 렌더링 루프 진입 이전에 Cubemap 버퍼에 HDR 이미지 렌더링 */
 
@@ -516,31 +466,10 @@ int main()
   /*
     split-sum approximation(= specular term 적분식)에서
     두 번째 적분식의 결과값(= BRDF Integration map)를 렌더링할 color buffer 로써 2D 텍스쳐 객체 생성
+
+    -> split-sum approximation 의 두 번째 적분식의 scale, bias 값만 r, g 채널에 각각 저장하기 위해 GL_RG16F 포맷으로 생성
   */
-
-  // 텍스쳐 객체(object) 참조 id 를 저장할 변수 선언
-  unsigned int brdfLUTTexture;
-
-  // 텍스쳐 객체 생성 및 바인딩
-  glGenTextures(1, &brdfLUTTexture);
-  glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
-
-  /*
-    [0, 1] 범위를 넘어선 HDR 이미지 데이터(data)들을 온전히 저장하고,
-    split-sum approximation 의 두 번째 적분식의 scale, bias 값만 r, g 채널에 각각 저장하기 위해
-    GL_RG16F floating point(부동 소수점) 포맷으로 프레임버퍼의 내부 색상 포맷 지정
-    (하단 Floating point framebuffer 관련 필기 참고)
-  */
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0, GL_RG, GL_FLOAT, 0);
-
-  // 현재 GL_TEXTURE_2D 상태에 바인딩된 텍스쳐 객체 설정하기
-  // Texture Wrapping 모드를 반복 모드로 설정 ([(0, 0), (1, 1)] 범위를 벗어나는 텍스쳐 좌표에 대한 처리)
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-  // 텍스쳐 축소/확대 및 Mipmap 교체 시 Texture Filtering (텍셀 필터링(보간)) 모드 설정
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  Texture brdfLUTTexture(512, 512, GL_RG16F, GL_RG);
 
   /* 렌더링 루프 진입 이전에 2D 텍스쳐 버퍼에 BRDF Integration map 렌더링 */
 
@@ -555,7 +484,7 @@ int main()
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
 
   // BRDF Integration map 을 현재 바인딩된 FBO 객체에 attach
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture.getID(), 0);
 
   // BRDF Integration map 의 해상도에 맞춰 viewport 해상도 설정
   glViewport(0, 0, 512, 512);
@@ -642,11 +571,8 @@ int main()
 
     /* 미리 계산된 split-sum approximation 의 두 번째 적분식 결과값이 저장되어 있는 BRDF Integration map 을 바인딩 */
 
-    // BRDF Integration map 이 렌더링된 2D 텍스쳐를 바인딩할 2번 texture unit 활성화
-    glActiveTexture(GL_TEXTURE2);
-
-    // brdfLUTTexture 큐브맵 텍스쳐 바인딩
-    glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
+    // BRDF Integration map 이 렌더링된 2D 텍스쳐를 2번 texture unit 에 바인딩해서 사용
+    brdfLUTTexture.use(GL_TEXTURE2);
 
     /* 각 Sphere 에 적용할 모델행렬 계산 및 Sphere 렌더링 */
 
@@ -740,79 +666,6 @@ int main()
   return 0;
 }
 
-// 전방선언된 콜백함수 정의
-
-// 텍스쳐 이미지 로드 및 객체 생성 함수 구현부 (텍스쳐 객체 참조 id 반환)
-unsigned int loadTexture(const char *path)
-{
-  unsigned int textureID;       // 텍스쳐 객체(object) 참조 id 를 저장할 변수 선언
-  glGenTextures(1, &textureID); // 텍스쳐 객체 생성
-
-  int width, height, nrComponents; // 로드한 이미지의 width, height, 색상 채널 개수를 저장할 변수 선언
-
-  // 이미지 데이터 가져와서 char 타입의 bytes 데이터로 저장.
-  // 이미지 width, height, 색상 채널 변수의 주소값도 넘겨줌으로써, 해당 함수 내부에서 값을 변경. -> 출력변수 역할
-  unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
-  if (data)
-  {
-    // 이미지 데이터 로드 성공 시 처리
-
-    // 이미지 데이터의 색상 채널 개수에 따라 glTexImage2D() 에 넘겨줄 픽셀 데이터 포맷의 ENUM 값을 결정
-    GLenum format;
-    if (nrComponents == 1)
-      format = GL_RED;
-    else if (nrComponents == 3)
-      format = GL_RGB;
-    else if (nrComponents == 4)
-      format = GL_RGBA;
-
-    // 텍스쳐 객체 바인딩 및 로드한 이미지 데이터 쓰기
-    glBindTexture(GL_TEXTURE_2D, textureID);                                                  // GL_TEXTURE_2D 타입의 상태에 텍스쳐 객체 바인딩 > 이후 텍스쳐 객체 설정 명령은 바인딩된 텍스쳐 객체에 적용.
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data); // 로드한 이미지 데이터를 현재 바인딩된 텍스쳐 객체에 덮어쓰기
-    glGenerateMipmap(GL_TEXTURE_2D);                                                          // 현재 바인딩된 텍스쳐 객체에 필요한 모든 단계의 Mipmap 을 자동 생성함.
-
-    // 현재 GL_TEXTURE_2D 상태에 바인딩된 텍스쳐 객체 설정하기
-    // Texture Wrapping 모드를 반복 모드로 설정 ([(0, 0), (1, 1)] 범위를 벗어나는 텍스쳐 좌표에 대한 처리)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    // 텍스쳐 축소/확대 및 Mipmap 교체 시 Texture Filtering (텍셀 필터링(보간)) 모드 설정 (관련 필기 정리 하단 참고)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  }
-  else
-  {
-    // 이미지 데이터 로드 실패 시 처리
-    std::cout << "Texture failed to load at path: " << path << std::endl;
-  }
-
-  // 텍스쳐 객체에 이미지 데이터를 전달하고, 밉맵까지 생성 완료했다면, 로드한 이미지 데이터는 항상 메모리 해제할 것!
-  stbi_image_free(data);
-
-  // 텍스쳐 객체 참조 ID 반환
-  return textureID;
-}
-
-/*
-  stb_image.h
-
-  주요 이미지 파일 포맷을 로드할 수 있는
-  싱글 헤더 이미지로드 라이브러리.
-
-  #define 매크로 전처리기를 통해
-  특정 매크로를 선언함으로써, 헤더파일 내에서
-  해당 매크로 영역의 코드만 include 할 수 있도록 함.
-
-  실제로 stb_image.h 안에 보면
-
-  #ifdef STB_IMAGE_IMPLEMENTATION
-  ~
-  #endif
-
-  요렇게 전처리기가 정의되어 있는 부분이 있음.
-  이 부분의 코드들만 include 하겠다는 것이지!
-*/
-
 /*
   .hdr 파일이란 무엇인가?
 
@@ -852,43 +705,6 @@ unsigned int loadTexture(const char *path)
   그래서 겉으로 보기에는 약간 이미지가 왜곡되어 보이는 느낌이 들고,
   대부분 가로 해상도가 더 넓기 때문에, cubemap 6면에서 top, bottom 면에 해당하는
   영역의 픽셀 정보가 투영되는 과정에서 약간 유실된다는 단점이 있음.
-*/
-
-/*
-  Floating point framebuffer
-
-
-  HDR 을 구현하려면, [0, 1] 범위를 넘어서는 색상값들이
-  프레임버퍼에 attach 된 텍스쳐 객체에 저장될 때,
-  [0, 1] 사이로 clamping 되지 않고,
-
-  원래의 색상값이 그대로 저장될 수 있어야 함.
-
-  그러나, 일반적인 프레임버퍼에서 color 를 저장할 때,
-  내부 포맷으로 사용하는 GL_RGB 같은 포맷은
-  fixed point(고정 소수점) 포맷이기 때문에,
-
-  OpenGL 에서 프레임버퍼에 색상값을 저장하기 전에
-  자동으로 [0, 1] 사이의 값으로 clamping 해버리는 문제가 있음.
-
-
-  이를 해결하기 위해,
-  GL_RGB16F, GL_RGBA16F, GL_RGB32F, GL_RGBA32F 같은
-  floating point(부동 소수점) 포맷으로
-  프레임버퍼의 내부 색상 포맷을 변경하면,
-
-  [0, 1] 범위를 벗어나는 값들에 대해서도
-  부동 소수점 형태로 저장할 수 있도록 해줌!
-
-
-  이때, 일반적인 프레임버퍼의 기본 색상 포맷인
-  GL_RGB 같은 경우 하나의 컴포넌트 당 8 bits 메모리를 사용하는데,
-  GL_RGB32F, GL_RGBA32F 같은 포맷은 하나의 컴포넌트 당 32 bits 의 메모리를 사용하기 때문에,
-  우리는 이 정도로 많은 메모리를 필요로 하지는 않음.
-
-  따라서, GL_RGB16F, GL_RGBA16F 같이
-  한 컴포넌트 당 16 bits 정도의 메모리를 예약해서 사용하는
-  적당한 크기의 색상 포맷으로 사용하는 게 좋겠지!
 */
 
 /*
