@@ -12,6 +12,7 @@
 #include "renderable_objects/cube.hpp"
 #include "renderable_objects/quad.hpp"
 #include "gl_objects/texture.hpp"
+#include "gl_objects/cube_texture.hpp"
 
 #include <iostream>
 #include <spdlog/spdlog.h>
@@ -152,40 +153,9 @@ int main()
   /* .hdr 이미지 로드하여 텍스쳐 객체 생성 */
   Texture hdrTexture("resources/textures/hdr/newport_loft.hdr", GL_RGB16F, GL_RGB);
 
-  /* HDR 이미지 텍스쳐를 렌더링할 color buffer 로써 Cubemap 텍스쳐 객체 생성 */
-
-  // Cubemap 텍스쳐 생성 및 바인딩
-  unsigned int envCubemap;
-  glGenTextures(1, &envCubemap);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-
-  // 반복문을 순회하며 Cubemap 각 6면에 이미지 데이터를 저장할 메모리 할당
-  for (unsigned int i = 0; i < 6; i++)
-  {
-    /*
-      HDR 이미지 텍스쳐 생성할 때와 마찬가지로, Cubemap 텍스쳐 또한
-      [0, 1] 범위를 넘어선 HDR 이미지 데이터(data)들을 온전히 저장하기 위해,
-
-      GL_RGB16F floating point(부동 소수점) 포맷으로 프레임버퍼의 내부 색상 포맷 지정
-      (하단 Floating point framebuffer 관련 필기 참고)
-    */
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
-  }
-
-  // 현재 GL_TEXTURE_2D 상태에 바인딩된 텍스쳐 객체 설정하기
-  // Texture Wrapping 모드를 반복 모드로 설정 ([(0, 0), (1, 1)] 범위를 벗어나는 텍스쳐 좌표에 대한 처리)
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-  // 텍스쳐 축소/확대 및 Mipmap 교체 시 Texture Filtering (텍셀 필터링(보간)) 모드 설정
-  /*
-    Bright dot artifact 해결을 위해 원본 HDR Cubemap 버퍼에서 mipmap 을 생성하므로,
-    MIN_FILTER 모드를 GL_LINEAR_MIPMAP_LINEAR 로 지정해서
-    LOD 에 따라 mipmap 사이의 trilinear interpolation 을 적용함. (노션 IBL 필기 참고)
-  */
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  /* HDR 이미지 텍스쳐를 Cubemap 형태로 변환할 color buffer 로써 Cubemap 텍스쳐 객체 생성 */
+  CubeTexture envCubemap(512, 512, GL_RGB16F, GL_RGB);
+  envCubemap.setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
 
   /* Cubemap 텍스쳐의 각 면에 HDR 이미지 데이터를 렌더링할 때 적용할 행렬값 초기화 */
 
@@ -232,7 +202,7 @@ int main()
     equirectangularToCubemapShader.setMat4("view", captureViews[i]);
 
     // Cubemap 버퍼의 각 면을 현재 바인딩된 FBO 객체에 돌아가며 attach
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap.getID(), 0);
 
     // 단위 큐브를 attach 된 Cubemap 버퍼에 렌더링하기 전, 색상 버퍼와 깊이 버퍼를 깨끗하게 비워줌
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -245,47 +215,10 @@ int main()
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   /* Bright dot artifact 해결을 위해 원본 HDR Cubemap 의 mipmap 생성 */
-
-  // mipmap 을 생성할 원본 HDR Cubemap 바인딩
-  glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-
-  // 현재 바인딩된 원본 HDR Cubemap 에 대해서 mipmap 메모리 공간 할당
-  glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+  envCubemap.generateMipmap();
 
   /* diffuse term 적분식의 결과값(= irradiance)를 렌더링할 color buffer 로써 Cubemap 텍스쳐 객체 생성 */
-
-  // Cubemap 텍스쳐 생성 및 바인딩
-  unsigned int irradianceMap;
-  glGenTextures(1, &irradianceMap);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
-
-  // 반복문을 순회하며 Cubemap 각 6면에 이미지 데이터를 저장할 메모리 할당
-  for (unsigned int i = 0; i < 6; i++)
-  {
-    /*
-      [0, 1] 범위를 넘어선 HDR 이미지 데이터(data)들을 온전히 저장하기 위해,
-      GL_RGB16F floating point(부동 소수점) 포맷으로 프레임버퍼의 내부 색상 포맷 지정.
-
-      또한, irradiance map 은 HDR 큐브맵을 convolution 하여 만든 결과물이 저장되므로,
-      HDR 큐브맵을 흐릿하게 blur 처리한 것처럼 보임.
-
-      -> 그렇다면, 어차피 흐릿해지는 irradiance cubemap 을 만들기 위해
-      굳이 고해상도 큐브맵은 필요하지 않겠지.
-
-      그래서, irradiance Cubemap 버퍼의 각 면의 해상도를 32 * 32 정도로 낮게 설정함.
-    */
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0, GL_RGB, GL_FLOAT, nullptr);
-  }
-
-  // 현재 GL_TEXTURE_2D 상태에 바인딩된 텍스쳐 객체 설정하기
-  // Texture Wrapping 모드를 반복 모드로 설정 ([(0, 0), (1, 1)] 범위를 벗어나는 텍스쳐 좌표에 대한 처리)
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-  // 텍스쳐 축소/확대 및 Mipmap 교체 시 Texture Filtering (텍셀 필터링(보간)) 모드 설정
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  CubeTexture irradianceMap(32, 32, GL_RGB16F, GL_RGB);
 
   // irradiance map 을 렌더링할 때 사용할 FBO 객체 및 RBO 객체 바인딩
   glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
@@ -306,11 +239,8 @@ int main()
   // fov(시야각)이 90로 고정된 투영행렬 전송
   irradianceShader.setMat4("projection", captureProjection);
 
-  // HDR 큐브맵 텍스쳐를 바인딩할 0번 texture unit 활성화
-  glActiveTexture(GL_TEXTURE0);
-
-  // 0번 texture unit 에 HDR 큐브맵 텍스쳐 바인딩
-  glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+  // HDR 큐브맵 텍스쳐를 0번 texture unit 에 바인딩하여 사용
+  envCubemap.use(GL_TEXTURE0);
 
   /* 렌더링 루프 진입 이전에 Cubemap 버퍼에 irradiance map 렌더링 */
 
@@ -327,7 +257,7 @@ int main()
     irradianceShader.setMat4("view", captureViews[i]);
 
     // Cubemap 버퍼의 각 면을 현재 바인딩된 FBO 객체에 돌아가며 attach
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap.getID(), 0);
 
     // 단위 큐브를 attach 된 Cubemap 버퍼에 렌더링하기 전, 색상 버퍼와 깊이 버퍼를 깨끗하게 비워줌
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -344,46 +274,8 @@ int main()
     첫 번째 적분식의 결과값(= pre-filtered environment map)를 렌더링할 color buffer 로써
     Cubemap 텍스쳐 객체 생성
   */
-
-  // Cubemap 텍스쳐 생성 및 바인딩
-  unsigned int prefilterMap;
-  glGenTextures(1, &prefilterMap);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
-
-  // 반복문을 순회하며 Cubemap 각 6면에 이미지 데이터를 저장할 메모리 할당
-  for (unsigned int i = 0; i < 6; i++)
-  {
-    /*
-      [0, 1] 범위를 넘어선 HDR 이미지 데이터(data)들을 온전히 저장하기 위해,
-      GL_RGB16F floating point(부동 소수점) 포맷으로 프레임버퍼의 내부 색상 포맷 지정.
-
-      또한, pre-filtered enviroment map 또한 irradiance map 과 유사하게
-      HDR 큐브맵을 convolution 하여 만든 결과물이 저장되므로,
-      HDR 큐브맵을 흐릿하게 blur 처리한 것처럼 보임.
-
-      그래서 굳이 고해상도의 큐브맵은 필요하지 않지만,
-      roughness level 에 따라 5단계의 mipmap 에 저장할 것이므로,
-      가장 해상도가 낮은 mip level 이 irradiance map 의 해상도와 동일한 32 * 32 로 생성되도록
-      base mip level 의 해상도는 그것의 4배 정도가 적당할 것임.
-
-      그래서, pre-filtered enviroment map 버퍼의 각 면의 해상도를 128 * 128 정도로 낮게 설정함.
-    */
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 128, 128, 0, GL_RGB, GL_FLOAT, nullptr);
-  }
-
-  // 현재 GL_TEXTURE_2D 상태에 바인딩된 텍스쳐 객체 설정하기
-  // Texture Wrapping 모드를 반복 모드로 설정 ([(0, 0), (1, 1)] 범위를 벗어나는 텍스쳐 좌표에 대한 처리)
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-  // 텍스쳐 축소/확대 및 Mipmap 교체 시 Texture Filtering (텍셀 필터링(보간)) 모드 설정
-  // 텍스쳐 축소 시, trilinear filtering 기법 적용을 위해 GL_LINEAR_MIPMAP_LINEAR 모드로 설정 (노션 필기 참고)
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // 현재 바인딩된 Cubemap 에 대해서 roughness level 에 따른 pre-filtered envmap 을 저장할 mipmap 메모리 공간 할당
-  glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+  CubeTexture prefilterMap(128, 128, GL_RGB16F, GL_RGB);
+  prefilterMap.generateMipmap();
 
   /* prefilterShader 에 텍스쳐 및 행렬 전달 */
 
@@ -396,11 +288,8 @@ int main()
   // fov(시야각)이 90로 고정된 투영행렬 전송
   prefilterShader.setMat4("projection", captureProjection);
 
-  // HDR 큐브맵 텍스쳐를 바인딩할 0번 texture unit 활성화
-  glActiveTexture(GL_TEXTURE0);
-
-  // 0번 texture unit 에 HDR 큐브맵 텍스쳐 바인딩
-  glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+  // HDR 큐브맵 텍스쳐를 0번 texture unit 에 바인딩하여 사용
+  envCubemap.use(GL_TEXTURE0);
 
   /* 렌더링 루프 진입 이전에 Cubemap 버퍼에 각 mip level 마다 pre-filtered env map 렌더링 */
 
@@ -446,7 +335,7 @@ int main()
 
       // Cubemap 버퍼의 각 면을 현재 바인딩된 FBO 객체에 돌아가며 attach
       // glFramebufferTexture2D() 의 마지막 매개변수는 현재 바인딩된 프레임버퍼에 attach 할 Cubemap 의 mip level 을 전달함.
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap.getID(), mip);
 
       // 단위 큐브를 attach 된 Cubemap 버퍼에 렌더링하기 전, 색상 버퍼와 깊이 버퍼를 깨끗하게 비워줌
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -550,20 +439,10 @@ int main()
     pbrShader.setVec3("camPos", camera.Position);
 
     /* 미리 계산된 irradiance 가 저장되어 있는 irradianceMap 을 바인딩 */
-
-    // irradianceMap 이 렌더링된 큐브맵 텍스쳐를 바인딩할 0번 texture unit 활성화
-    glActiveTexture(GL_TEXTURE0);
-
-    // irradianceMap 큐브맵 텍스쳐 바인딩
-    glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+    irradianceMap.use(GL_TEXTURE0);
 
     /* 미리 계산된 split-sum approximation 의 첫 번째 적분식 결과값이 저장되어 있는 pre-filtered env map 을 바인딩 */
-
-    // pre-filtered env map 이 렌더링된 큐브맵 텍스쳐를 바인딩할 1번 texture unit 활성화
-    glActiveTexture(GL_TEXTURE1);
-
-    // prefilterMap 큐브맵 텍스쳐 바인딩
-    glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
+    prefilterMap.use(GL_TEXTURE1);
 
     /* 미리 계산된 split-sum approximation 의 두 번째 적분식 결과값이 저장되어 있는 BRDF Integration map 을 바인딩 */
     brdfLUTTexture.use(GL_TEXTURE2);
@@ -640,11 +519,8 @@ int main()
     backgroundShader.use();
     backgroundShader.setMat4("view", view);
 
-    // HDR 이미지 데이터가 렌더링된 큐브맵 텍스쳐를 바인딩할 0번 texture unit 활성화
-    glActiveTexture(GL_TEXTURE0);
-
-    // skybox 에 적용할 큐브맵 텍스쳐 바인딩
-    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    // HDR 큐브맵 텍스쳐를 0번 texture unit 에 바인딩하여 skybox 텍스쳐로 사용
+    envCubemap.use(GL_TEXTURE0);
 
     // skybox 렌더링
     cube.draw(backgroundShader);
