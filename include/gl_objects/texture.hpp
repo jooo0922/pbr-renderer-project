@@ -35,7 +35,7 @@ public:
   // 텍스쳐 메모리 반납
   void destroy() override;
 
-  // 텍스쳐 활성화
+  // 텍스쳐를 바인딩할 texture unit 활성화 및 바인딩
   void use(GLenum textureUnit) const;
 
   // 텍스쳐 파라미터 설정
@@ -46,6 +46,8 @@ public:
   void setMinFilter(GLint filterMode);
 
   void setMagFilter(GLint filterMode);
+
+  GLuint getID() const;
 
   // 밉맵 생성
   void generateMipmap();

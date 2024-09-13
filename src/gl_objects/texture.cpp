@@ -6,6 +6,9 @@
 Texture::Texture(const char *url, GLenum format, GLenum internalFormat)
     : format(format), internalFormat(internalFormat)
 {
+  // 텍스쳐 이미지 로드 후, y축 방향으로 뒤집어 줌 > OpenGL 이 텍스쳐 좌표를 읽는 방향과 이미지의 픽셀 좌표가 반대라서!
+  stbi_set_flip_vertically_on_load(true);
+
   int nrComponents;
 
   // 이미지 데이터 가져와서 float 타입의 bytes 데이터로 저장.
@@ -138,6 +141,11 @@ void Texture::setMagFilter(GLint filterMode)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 
   unbind();
+}
+
+GLuint Texture::getID() const
+{
+  return ID;
 }
 
 void Texture::generateMipmap()
