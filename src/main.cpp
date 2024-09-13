@@ -1,9 +1,5 @@
 #include <algorithm> // std::min(), std::max() 를 사용하기 위해 포함한 라이브러리
 
-// 이미지 파일 로드 라이브러리 include (관련 설명 하단 참고)
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
-
 // 행렬 및 벡터 계산에서 사용할 Header Only 라이브러리 include
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -570,8 +566,6 @@ int main()
     glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
 
     /* 미리 계산된 split-sum approximation 의 두 번째 적분식 결과값이 저장되어 있는 BRDF Integration map 을 바인딩 */
-
-    // BRDF Integration map 이 렌더링된 2D 텍스쳐를 2번 texture unit 에 바인딩해서 사용
     brdfLUTTexture.use(GL_TEXTURE2);
 
     /* 각 Sphere 에 적용할 모델행렬 계산 및 Sphere 렌더링 */

@@ -1,5 +1,9 @@
 #include "gl_objects/texture.hpp"
+
+// 이미지 파일 로드 라이브러리 include (관련 설명 하단 참고)
+#define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
+
 #include <stdexcept>
 #include <string>
 
