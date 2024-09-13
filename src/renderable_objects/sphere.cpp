@@ -3,14 +3,14 @@
 
 Sphere::Sphere()
 {
-  std::vector<SimpleVertex> vertices;
+  std::vector<SimpleVertexData> vertices;
   std::vector<unsigned int> indices;
 
   // 하위 클래스에서 구현된 vertex 데이터 생성
   generateVertexData(vertices, indices);
 
   // 생성된 데이터를 이용하여 Mesh 객체 인스턴스화 (mesh 멤버변수를 스마트 포인터로 관리하는 이유 하단 필기 참고)
-  mesh = std::make_unique<Mesh<SimpleVertex>>(vertices, indices);
+  mesh = std::make_unique<Mesh<SimpleVertexData>>(vertices, indices);
 
   // Sphere 렌더링을 위한 추가 작업 수행
   mesh->setDrawMode(GL_TRIANGLE_STRIP);
@@ -21,7 +21,7 @@ void Sphere::draw(Shader &shader)
   mesh->draw(shader);
 }
 
-void Sphere::generateVertexData(std::vector<SimpleVertex> &vertices, std::vector<unsigned int> &indices) const
+void Sphere::generateVertexData(std::vector<SimpleVertexData> &vertices, std::vector<unsigned int> &indices) const
 {
   // 구체의 가로 및 세로 방향 분할 수, Pi 값 초기화
   const unsigned int X_SEGMENTS = 64;
@@ -52,7 +52,7 @@ void Sphere::generateVertexData(std::vector<SimpleVertex> &vertices, std::vector
       float yPos = std::cos(ySegment * PI);
       float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
 
-      SimpleVertex vertex;
+      SimpleVertexData vertex;
       vertex.Position = glm::vec3(xPos, yPos, zPos);
       vertex.Normal = glm::vec3(xPos, yPos, zPos);
       vertex.TexCoords = glm::vec2(xSegment, ySegment);

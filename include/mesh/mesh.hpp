@@ -18,7 +18,7 @@
 #define MAX_BONE_INFLUENCE 4
 
 // 메모리 낭비를 줄이기 위한 간소화된 Vertex 구조체 선언
-struct SimpleVertex
+struct SimpleVertexData
 {
   glm::vec3 Position;
   glm::vec3 Normal;
@@ -26,7 +26,7 @@ struct SimpleVertex
 };
 
 // 정점 구조체 선언
-struct Vertex
+struct VertexData
 {
   glm::vec3 Position;
   glm::vec3 Normal;
@@ -38,7 +38,7 @@ struct Vertex
 };
 
 // 텍스처 구조체 선언
-struct Texture
+struct TextureData
 {
   unsigned int id;
   std::string type;
@@ -54,27 +54,27 @@ struct Texture
  * -> 템플릿 클래스는 헤더 파일에 선언부와 구현부가 모두 포함되어 있어야
  * 템플릿의 자료형을 찾지 못하는 컴파일 에러가 발생하지 않음!
  */
-template <typename VertexType>
+template <typename VertexDataType>
 class Mesh
 {
 public:
   // 정점, 인덱스, 텍스처 데이터 멤버
-  std::vector<VertexType> vertices;
+  std::vector<VertexDataType> vertices;
   std::vector<unsigned int> indices;
-  std::vector<Texture> textures;
+  std::vector<TextureData> textures;
 
   // 기본 생성자
   Mesh() {}
 
   // 생성자 override
-  Mesh(const std::vector<VertexType> &vertices, const std::vector<unsigned int> &indices, const std::vector<Texture> &textures)
+  Mesh(const std::vector<VertexDataType> &vertices, const std::vector<unsigned int> &indices, const std::vector<TextureData> &textures)
       : vertices(vertices), indices(indices), textures(textures)
   {
     setupMesh();
   }
 
   // 생성자 override (texture 데이터 미전달)
-  Mesh(const std::vector<VertexType> &vertices, const std::vector<unsigned int> &indices)
+  Mesh(const std::vector<VertexDataType> &vertices, const std::vector<unsigned int> &indices)
       : vertices(vertices), indices(indices)
   {
     setupMesh();
@@ -165,7 +165,7 @@ private:
     vao.bind();
 
     // VBO에 데이터 설정
-    vbo.setData(vertices.data(), vertices.size() * sizeof(VertexType), GL_STATIC_DRAW);
+    vbo.setData(vertices.data(), vertices.size() * sizeof(VertexDataType), GL_STATIC_DRAW);
 
     // IBO에 데이터 설정
     ibo.setData(indices.data(), indices.size() * sizeof(unsigned int), GL_STATIC_DRAW);
@@ -186,23 +186,23 @@ private:
      *
      * -> 템플릿 프로그래밍에서 자주 사용되는 고급 C++ 기법들
      */
-    if constexpr (std::is_same_v<VertexType, Vertex>)
+    if constexpr (std::is_same_v<VertexDataType, VertexData>)
     {
       attributes = {
-          {0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, Position)},
-          {1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, Normal)},
-          {2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, TexCoords)},
-          {3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, Tangent)},
-          {4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, Bitangent)},
-          {5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, m_BoneIDs)},
-          {6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, m_Weights)}};
+          {0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, Position)},
+          {1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, Normal)},
+          {2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, TexCoords)},
+          {3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, Tangent)},
+          {4, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, Bitangent)},
+          {5, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, m_BoneIDs)},
+          {6, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, m_Weights)}};
     }
-    else if constexpr (std::is_same_v<VertexType, SimpleVertex>)
+    else if constexpr (std::is_same_v<VertexDataType, SimpleVertexData>)
     {
       attributes = {
-          {0, 3, GL_FLOAT, GL_FALSE, sizeof(SimpleVertex), (void *)offsetof(SimpleVertex, Position)},
-          {1, 3, GL_FLOAT, GL_FALSE, sizeof(SimpleVertex), (void *)offsetof(SimpleVertex, Normal)},
-          {2, 2, GL_FLOAT, GL_FALSE, sizeof(SimpleVertex), (void *)offsetof(SimpleVertex, TexCoords)}};
+          {0, 3, GL_FLOAT, GL_FALSE, sizeof(SimpleVertexData), (void *)offsetof(SimpleVertexData, Position)},
+          {1, 3, GL_FLOAT, GL_FALSE, sizeof(SimpleVertexData), (void *)offsetof(SimpleVertexData, Normal)},
+          {2, 2, GL_FLOAT, GL_FALSE, sizeof(SimpleVertexData), (void *)offsetof(SimpleVertexData, TexCoords)}};
     }
 
     // VBO 및 IBO 객체를 VAO 객체에 연결

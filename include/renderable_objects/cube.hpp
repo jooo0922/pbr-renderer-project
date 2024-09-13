@@ -20,7 +20,7 @@ public:
   void draw(Shader &shader) override;
 
 protected:
-  void generateVertexData(std::vector<SimpleVertex> &vertices, std::vector<unsigned int> &indices) const override;
+  void generateVertexData(std::vector<SimpleVertexData> &vertices, std::vector<unsigned int> &indices) const override;
 };
 
 #endif // CUBE_HPP

@@ -20,9 +20,9 @@ protected:
   Primitive() = default;
 
   // Mesh 클래스 멤버변수를 스마트 포인터로 관리하는 이유 sphere.cpp 필기 참고
-  std::unique_ptr<Mesh<SimpleVertex>> mesh;
+  std::unique_ptr<Mesh<SimpleVertexData>> mesh;
 
-  virtual void generateVertexData(std::vector<SimpleVertex> &vertices, std::vector<unsigned int> &indices) const = 0;
+  virtual void generateVertexData(std::vector<SimpleVertexData> &vertices, std::vector<unsigned int> &indices) const = 0;
 };
 
 #endif // PRIMITIVE_HPP

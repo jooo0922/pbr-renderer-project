@@ -3,14 +3,14 @@
 
 Cube::Cube()
 {
-  std::vector<SimpleVertex> vertices;
+  std::vector<SimpleVertexData> vertices;
   std::vector<unsigned int> indices;
 
   // 하위 클래스에서 구현된 vertex 데이터 생성
   generateVertexData(vertices, indices);
 
   // 생성된 데이터를 이용하여 Mesh 객체 인스턴스화 (mesh 멤버변수를 스마트 포인터로 관리하는 이유 하단 필기 참고)
-  mesh = std::make_unique<Mesh<SimpleVertex>>(vertices, indices);
+  mesh = std::make_unique<Mesh<SimpleVertexData>>(vertices, indices);
 }
 
 void Cube::draw(Shader &shader)
@@ -18,7 +18,7 @@ void Cube::draw(Shader &shader)
   mesh->draw(shader);
 }
 
-void Cube::generateVertexData(std::vector<SimpleVertex> &vertices, std::vector<unsigned int> &indices) const
+void Cube::generateVertexData(std::vector<SimpleVertexData> &vertices, std::vector<unsigned int> &indices) const
 {
   // Cube 정점 데이터 추가
   vertices = {
