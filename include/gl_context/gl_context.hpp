@@ -7,11 +7,7 @@
 */
 
 #include <glad/glad.h> // OpenGL 함수를 초기화하기 위한 헤더
-
-// 행렬 및 벡터 계산에서 사용할 Header Only 라이브러리 include
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 /**
  * OpenGL 전역 상태를 관리하는 싱글톤 클래스
