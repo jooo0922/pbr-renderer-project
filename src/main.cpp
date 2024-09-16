@@ -13,6 +13,8 @@
 #include "renderable_objects/quad.hpp"
 #include "gl_objects/texture.hpp"
 #include "gl_objects/cube_texture.hpp"
+#include "gl_objects/frame_buffer_object.hpp"
+#include "gl_objects/render_buffer_object.hpp"
 
 #include <iostream>
 #include <spdlog/spdlog.h>
@@ -134,21 +136,18 @@ int main()
   /* Equirectangular HDR 파일 > Cubemap 변환 시 필요한 버퍼 생성 및 바인딩 */
 
   // Equirectangular HDR 파일을 샘플링하여 렌더링할 FBO(FrameBufferObject) 객체 및 RBO(RenderBufferObject) 생성
-  unsigned int captureFBO;
-  unsigned int captureRBO;
-  glGenFramebuffers(1, &captureFBO);
-  glGenRenderbuffers(1, &captureRBO);
+  FrameBufferObject captureFBO;
+  RenderBufferObject captureRBO;
 
   // 생성한 FBO 객체 및 RBO 객체 바인딩
-  glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-  glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+  captureFBO.bind();
+  captureRBO.bind();
 
-  // RBO 객체 메모리 공간 할당 -> 단일 Renderbuffer 에 depth 값만 저장하는 데이터 포맷 지정(GL_DEPTH_COMPONENT24)
   // Renderbuffer 해상도를 Cubemap 각 면의 해상도인 512 * 512 로 맞춤.
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+  captureRBO.setStorage(512, 512);
 
   // FBO 객체에 생성한 RBO 객체 attach
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+  captureFBO.attachRenderBuffer(captureRBO.getID());
 
   /* .hdr 이미지 로드하여 텍스쳐 객체 생성 */
   Texture hdrTexture("resources/textures/hdr/newport_loft.hdr", GL_RGB16F, GL_RGB);
@@ -193,7 +192,7 @@ int main()
   glViewport(0, 0, 512, 512);
 
   // Cubemap 버퍼의 각 면을 attach 할 FBO 객체 바인딩
-  glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+  captureFBO.bind();
 
   // HDR 이미지가 적용된 단위 큐브의 각 면을 바라보도록 카메라를 회전시키며 6번 렌더링
   for (unsigned int i = 0; i < 6; i++)
@@ -202,7 +201,7 @@ int main()
     equirectangularToCubemapShader.setMat4("view", captureViews[i]);
 
     // Cubemap 버퍼의 각 면을 현재 바인딩된 FBO 객체에 돌아가며 attach
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap.getID(), 0);
+    captureFBO.attachTexture(envCubemap.getID(), GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
 
     // 단위 큐브를 attach 된 Cubemap 버퍼에 렌더링하기 전, 색상 버퍼와 깊이 버퍼를 깨끗하게 비워줌
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -212,7 +211,7 @@ int main()
   }
 
   // Cubemap 버퍼에 렌더링 완료 후, 기본 프레임버퍼로 바인딩 초기화
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  captureFBO.unbind();
 
   /* Bright dot artifact 해결을 위해 원본 HDR Cubemap 의 mipmap 생성 */
   envCubemap.generateMipmap();
@@ -221,12 +220,11 @@ int main()
   CubeTexture irradianceMap(32, 32, GL_RGB16F, GL_RGB);
 
   // irradiance map 을 렌더링할 때 사용할 FBO 객체 및 RBO 객체 바인딩
-  glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-  glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+  captureFBO.bind();
+  captureRBO.bind();
 
-  // RBO 객체 메모리 공간 할당 -> 단일 Renderbuffer 에 depth 값만 저장하는 데이터 포맷 지정(GL_DEPTH_COMPONENT24)
   // Renderbuffer 해상도를 Cubemap 각 면의 해상도인 32 * 32 로 맞춤.
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);
+  captureRBO.setStorage(32, 32);
 
   /* irradianceShader 에 텍스쳐 및 행렬 전달 */
 
@@ -248,7 +246,7 @@ int main()
   glViewport(0, 0, 32, 32);
 
   // Cubemap 버퍼의 각 면을 attach 할 FBO 객체 바인딩
-  glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+  captureFBO.bind();
 
   // irradiance map 을 렌더링할 단위 큐브의 각 면을 바라보도록 카메라를 회전시키며 6번 렌더링
   for (unsigned int i = 0; i < 6; i++)
@@ -257,7 +255,7 @@ int main()
     irradianceShader.setMat4("view", captureViews[i]);
 
     // Cubemap 버퍼의 각 면을 현재 바인딩된 FBO 객체에 돌아가며 attach
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap.getID(), 0);
+    captureFBO.attachTexture(irradianceMap.getID(), GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
 
     // 단위 큐브를 attach 된 Cubemap 버퍼에 렌더링하기 전, 색상 버퍼와 깊이 버퍼를 깨끗하게 비워줌
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -267,7 +265,7 @@ int main()
   }
 
   // Cubemap 버퍼에 렌더링 완료 후, 기본 프레임버퍼로 바인딩 초기화
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  captureFBO.unbind();
 
   /*
     split-sum approximation(= specular term 적분식)에서
@@ -294,7 +292,7 @@ int main()
   /* 렌더링 루프 진입 이전에 Cubemap 버퍼에 각 mip level 마다 pre-filtered env map 렌더링 */
 
   // Cubemap 버퍼의 각 면을 attach 할 FBO 객체 바인딩
-  glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+  captureFBO.bind();
 
   // 최대 mip level 변수 초기화
   unsigned int maxMipLevels = 5;
@@ -311,11 +309,10 @@ int main()
     unsigned int mipHeight = 128 * std::pow(0.5, mip);
 
     // pre-filtered env map 을 렌더링할 때 사용할 RBO 객체 바인딩
-    glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+    captureRBO.bind();
 
-    // RBO 객체 메모리 공간 할당 -> 단일 Renderbuffer 에 depth 값만 저장하는 데이터 포맷 지정(GL_DEPTH_COMPONENT24)
     // Renderbuffer 해상도를 각 mipmap 의 해상도로 맞춤.
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
+    captureRBO.setStorage(mipWidth, mipHeight);
 
     // Cubemap 버퍼의 각 면의 해상도를 각 mipmap 의 해상도로 맞춰 viewport 해상도 설정
     glViewport(0, 0, mipWidth, mipHeight);
@@ -335,7 +332,7 @@ int main()
 
       // Cubemap 버퍼의 각 면을 현재 바인딩된 FBO 객체에 돌아가며 attach
       // glFramebufferTexture2D() 의 마지막 매개변수는 현재 바인딩된 프레임버퍼에 attach 할 Cubemap 의 mip level 을 전달함.
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap.getID(), mip);
+      captureFBO.attachTexture(prefilterMap.getID(), GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mip);
 
       // 단위 큐브를 attach 된 Cubemap 버퍼에 렌더링하기 전, 색상 버퍼와 깊이 버퍼를 깨끗하게 비워줌
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -346,7 +343,7 @@ int main()
   }
 
   // Cubemap 버퍼에 렌더링 완료 후, 기본 프레임버퍼로 바인딩 초기화
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  captureFBO.unbind();
 
   /*
     split-sum approximation(= specular term 적분식)에서
@@ -359,17 +356,16 @@ int main()
   /* 렌더링 루프 진입 이전에 2D 텍스쳐 버퍼에 BRDF Integration map 렌더링 */
 
   // BRDF Integration map 버퍼를 attach 할 FBO 객체 바인딩
-  glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+  captureFBO.bind();
 
   // BRDF Integration map 을 렌더링할 때 사용할 RBO 객체 바인딩
-  glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+  captureRBO.bind();
 
-  // RBO 객체 메모리 공간 할당 -> 단일 Renderbuffer 에 depth 값만 저장하는 데이터 포맷 지정(GL_DEPTH_COMPONENT24)
   // Renderbuffer 해상도를 BRDF Integration map 의 해상도로 맞춤.
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+  captureRBO.setStorage(512, 512);
 
   // BRDF Integration map 을 현재 바인딩된 FBO 객체에 attach
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture.getID(), 0);
+  captureFBO.attachTexture(brdfLUTTexture.getID(), GL_TEXTURE_2D);
 
   // BRDF Integration map 의 해상도에 맞춰 viewport 해상도 설정
   glViewport(0, 0, 512, 512);
@@ -384,7 +380,7 @@ int main()
   quad.draw(brdfShader);
 
   // BRDF Integration map 버퍼에 렌더링 완료 후, 기본 프레임버퍼로 바인딩 초기화
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  captureFBO.unbind();
 
   /*
     투영행렬을 렌더링 루프 이전에 미리 계산
