@@ -15,6 +15,7 @@
 #include "gl_objects/cube_texture.hpp"
 #include "gl_objects/frame_buffer_object.hpp"
 #include "gl_objects/render_buffer_object.hpp"
+#include "gl_context/gl_context.hpp"
 
 #include <iostream>
 #include <spdlog/spdlog.h>
@@ -39,14 +40,8 @@ int main()
 
   /* OpenGL 전역 상태값 설정 */
 
-  // Depth Test(깊이 테스팅) 상태를 활성화함
-  glEnable(GL_DEPTH_TEST);
-
-  // 깊이 테스트 함수 변경 (skybox 렌더링 목적)
-  glDepthFunc(GL_LEQUAL);
-
-  // Cubemap 의 각 face 사이의 seam line 방지 활성화 (하단 필기 참고)
-  glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+  // GLContext 싱글턴 인스턴스 접근
+  GLContext &glContext = GLContext::getInstance();
 
   /* PBR 구현에 필요한 쉐이더 객체 생성 및 컴파일 */
 
@@ -189,7 +184,7 @@ int main()
   /* 렌더링 루프 진입 이전에 Cubemap 버퍼에 HDR 이미지 렌더링 */
 
   // Cubemap 버퍼의 각 면의 해상도 512 * 512 에 맞춰 viewport 해상도 설정
-  glViewport(0, 0, 512, 512);
+  glContext.resize(512, 512);
 
   // Cubemap 버퍼의 각 면을 attach 할 FBO 객체 바인딩
   captureFBO.bind();
@@ -204,7 +199,7 @@ int main()
     captureFBO.attachTexture(envCubemap.getID(), GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
 
     // 단위 큐브를 attach 된 Cubemap 버퍼에 렌더링하기 전, 색상 버퍼와 깊이 버퍼를 깨끗하게 비워줌
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glContext.clear();
 
     // 단위 큐브 렌더링 -> Point Shadow 에서는 Cubemap 버퍼 각 면에 렌더링해주는 작업을 geometry shader 에서 처리해줬었지!
     cube.draw(equirectangularToCubemapShader);
@@ -243,7 +238,7 @@ int main()
   /* 렌더링 루프 진입 이전에 Cubemap 버퍼에 irradiance map 렌더링 */
 
   // Cubemap 버퍼의 각 면의 해상도 32 * 32 에 맞춰 viewport 해상도 설정
-  glViewport(0, 0, 32, 32);
+  glContext.resize(32, 32);
 
   // Cubemap 버퍼의 각 면을 attach 할 FBO 객체 바인딩
   captureFBO.bind();
@@ -258,7 +253,7 @@ int main()
     captureFBO.attachTexture(irradianceMap.getID(), GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
 
     // 단위 큐브를 attach 된 Cubemap 버퍼에 렌더링하기 전, 색상 버퍼와 깊이 버퍼를 깨끗하게 비워줌
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glContext.clear();
 
     // 단위 큐브 렌더링 -> irradianceShader 에서 적분식을 풀면서 각 프래그먼트 지점의 irradiance 를 Cubemap 버퍼에 저장함.
     cube.draw(irradianceShader);
@@ -315,7 +310,7 @@ int main()
     captureRBO.setStorage(mipWidth, mipHeight);
 
     // Cubemap 버퍼의 각 면의 해상도를 각 mipmap 의 해상도로 맞춰 viewport 해상도 설정
-    glViewport(0, 0, mipWidth, mipHeight);
+    glContext.resize(mipWidth, mipHeight);
 
     /*
       각 mip level 에 따라 prefilterShader 쉐이더 객체에 전송할 [0.0, 1.0] 사이의 roughness 값 계산
@@ -335,7 +330,7 @@ int main()
       captureFBO.attachTexture(prefilterMap.getID(), GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mip);
 
       // 단위 큐브를 attach 된 Cubemap 버퍼에 렌더링하기 전, 색상 버퍼와 깊이 버퍼를 깨끗하게 비워줌
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glContext.clear();
 
       // 단위 큐브 렌더링 -> prefilterShader 에서 split sum approximation 의 첫 번째 적분식의 결과값을 풀어 Cubemap 버퍼에 저장함.
       cube.draw(prefilterShader);
@@ -368,13 +363,13 @@ int main()
   captureFBO.attachTexture(brdfLUTTexture.getID(), GL_TEXTURE_2D);
 
   // BRDF Integration map 의 해상도에 맞춰 viewport 해상도 설정
-  glViewport(0, 0, 512, 512);
+  glContext.resize(512, 512);
 
   // brdfShader 쉐이더 바인딩
   brdfShader.use();
 
   // attach 된 BRDF Integration map 버퍼에 렌더링하기 전, 색상 버퍼와 깊이 버퍼를 깨끗하게 비워줌
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glContext.clear();
 
   // 단일 QuadMesh 렌더링 -> brdfShader 에서 split sum approximation 의 두 번째 적분식의 결과값을 풀어 BRDF Integration map 버퍼에 저장함.
   quad.draw(brdfShader);
@@ -410,11 +405,8 @@ int main()
     // 렌더링 루프에서의 glfw 처리
     glfwImpl.process();
 
-    // 현재까지 저장되어 있는 프레임 버퍼(그 중에서도 색상 버퍼) 초기화하기
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
     // 색상 버퍼 및 깊이 버퍼 초기화
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glContext.clear();
 
     /* 여기서부터 루프에서 실행시킬 모든 렌더링 명령(rendering commands)을 작성함. */
 

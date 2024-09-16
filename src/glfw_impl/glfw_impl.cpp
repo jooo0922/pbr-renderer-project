@@ -1,5 +1,6 @@
 #include "glfw_impl/glfw_impl.hpp"
 #include "camera/camera.hpp" // Camera 클래스 멤버 함수 호출 시, 클래스 전체 정의가 담긴 Camera.hpp 헤더를 소스 파일에 포함해야 함.
+#include "gl_context/gl_context.hpp"
 
 GLFWImpl::GLFWImpl(int width, int height, const char *title, Camera *camera)
     : width(width), height(height), title(title),
@@ -94,7 +95,7 @@ void GLFWImpl::restoreViewport()
   glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
 
   // 기본 프레임버퍼 해상도 복구
-  glViewport(0, 0, scrWidth, scrHeight);
+  GLContext::getInstance().resize(scrWidth, scrHeight);
 }
 
 void GLFWImpl::process()
@@ -134,7 +135,7 @@ double GLFWImpl::getTime()
 // GLFWwindow 윈도우 창 리사이징 감지 시, 호출할 콜백 함수 정의
 void GLFWImpl::framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
-  glViewport(0, 0, width, height);
+  GLContext::getInstance().resize(width, height);
 }
 
 // GLFW 윈도우에 마우스 입력 감지 시, 호출할 콜백함수 정의
