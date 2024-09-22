@@ -19,7 +19,7 @@ class VertexBufferObject final : public IGLObject
 public:
   VertexBufferObject();
 
-  ~VertexBufferObject() override;
+  ~VertexBufferObject();
 
   void setData(const void *data, GLsizeiptr size, GLenum usage);
 

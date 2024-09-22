@@ -19,7 +19,7 @@ class RenderBufferObject final : public IGLObject
 public:
   RenderBufferObject();
 
-  ~RenderBufferObject() override;
+  ~RenderBufferObject();
 
   void setStorage(GLsizei width, GLsizei height) const;
 

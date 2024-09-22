@@ -14,9 +14,6 @@ public:
   // 생성자
   Quad();
 
-  // 기본 소멸자
-  ~Quad() override = default;
-
   void draw(Shader &shader) override;
 
 protected:

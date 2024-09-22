@@ -25,7 +25,7 @@ public:
   CubeTexture(GLsizei width, GLsizei height, GLenum format, GLenum internalFormat);
 
   // 소멸자
-  ~CubeTexture() override;
+  ~CubeTexture();
 
   // 텍스쳐 바인딩
   void bind() const override;

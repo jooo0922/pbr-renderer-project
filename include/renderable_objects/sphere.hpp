@@ -14,9 +14,6 @@ public:
   // 생성자
   Sphere();
 
-  // 기본 소멸자
-  ~Sphere() override = default;
-
   void draw(Shader &shader) override;
 
 protected:

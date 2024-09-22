@@ -19,7 +19,7 @@ class FrameBufferObject final : public IGLObject
 public:
   FrameBufferObject();
 
-  ~FrameBufferObject() override;
+  ~FrameBufferObject();
 
   void attachTexture(GLuint textureID, GLenum target, GLint mipLevel = 0) const;
 

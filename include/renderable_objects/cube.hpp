@@ -14,9 +14,6 @@ public:
   // 생성자
   Cube();
 
-  // 기본 소멸자
-  ~Cube() override = default;
-
   void draw(Shader &shader) override;
 
 protected:

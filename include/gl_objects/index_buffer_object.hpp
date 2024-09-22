@@ -19,7 +19,7 @@ class IndexBufferObject final : public IGLObject
 public:
   IndexBufferObject();
 
-  ~IndexBufferObject() override;
+  ~IndexBufferObject();
 
   void setData(const void *data, GLsizeiptr size, GLenum usage);
 
