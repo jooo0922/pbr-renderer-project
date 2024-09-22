@@ -95,7 +95,7 @@ int main()
   backgroundShader.setInt("environmentMap", 0);
 
   /* 광원 데이터 초기화 */
-
+  // TODO : Light 클래스 추상화 -> Light 관련 Feature 클래스 구현 시 추상화할 것.
   // 광원 위치값이 담긴 정적 배열 초기화
   glm::vec3 lightPositions[] = {
       glm::vec3(-10.0f, 10.0f, 10.0f),
@@ -440,42 +440,24 @@ int main()
     // 모델행렬을 단위행렬로 초기화
     glm::mat4 model = glm::mat4(1.0f);
 
-    // 각 행과 열을 이중 for-loop 로 순회하며 각 구체의 모델행렬 계산
-    for (int row = 0; row < nrRows; ++row)
-    {
-      // 각 행의 구체끼리 동일한 metallic 값([0, 1] 범위 사이)을 계산하여 전송
-      pbrShader.setFloat("metallic", (float)row / (float)nrRows);
+    pbrShader.setFloat("metallic", 0.0f);
+    pbrShader.setFloat("roughness", 0.5f);
 
-      for (int col = 0; col < nrColumns; ++col)
-      {
-        // 각 열의 구체끼리 동일한 roughness 값([0.05, 1] 범위 사이)을 계산하여 전송
-        // roughness 값이 0.0 이면 약간 이상해보여서 최소값을 0.05 로 clamping 했다고 함!
-        pbrShader.setFloat("roughness", glm::clamp((float)col / (float)nrColumns, 0.05f, 1.0f));
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
 
-        /*
-          원점을 기준으로 현재 순회중인 행과 열을 계산하고,
-          spacing 간격 만큼 떨어트려 x, y 위치값을 구해 모델행렬 계산
-        */
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(
-                                          (float)(col - (nrColumns / 2)) * spacing,
-                                          (float)(row - (nrRows / 2)) * spacing,
-                                          -2.0f));
+    // 계산된 모델행렬을 쉐이더 프로그램에 전송
+    pbrShader.setMat4("model", model);
 
-        // 계산된 모델행렬을 쉐이더 프로그램에 전송
-        pbrShader.setMat4("model", model);
+    /*
+      쉐이더 코드에서 노멀벡터를 World Space 로 변환할 때
+      사용할 노멀행렬을 각 구체의 계산된 모델행렬로부터 계산 후,
+      쉐이더 코드에 전송
+    */
+    pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
 
-        /*
-          쉐이더 코드에서 노멀벡터를 World Space 로 변환할 때
-          사용할 노멀행렬을 각 구체의 계산된 모델행렬로부터 계산 후,
-          쉐이더 코드에 전송
-        */
-        pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-
-        // 구체 렌더링
-        sphere.draw(pbrShader);
-      }
-    }
+    // 구체 렌더링
+    sphere.draw(pbrShader);
 
     /* 광원 정보 쉐이더 전송 및 광원 위치 시각화를 위한 구체 렌더링 */
 
@@ -491,14 +473,6 @@ int main()
       // 광원 위치 및 색상 데이터를 쉐이더 프로그램에 전송
       pbrShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
       pbrShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
-
-      // 광원 위치 시각화를 위해 해당 위치에 구체 렌더링
-      model = glm::mat4(1.0f);
-      model = glm::translate(model, newPos);
-      model = glm::scale(model, glm::vec3(0.5f));
-      pbrShader.setMat4("model", model);
-      pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-      sphere.draw(pbrShader);
     }
 
     /* skybox 렌더링 */
