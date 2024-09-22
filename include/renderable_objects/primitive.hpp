@@ -13,12 +13,7 @@
 
 class Primitive : public IRenderableObject
 {
-public:
-  ~Primitive() override = default;
-
 protected:
-  Primitive() = default;
-
   // Mesh 클래스 멤버변수를 스마트 포인터로 관리하는 이유 sphere.cpp 필기 참고
   std::unique_ptr<Mesh<SimpleVertexData>> mesh;
 

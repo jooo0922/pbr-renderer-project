@@ -11,12 +11,7 @@
 class IRenderableObject
 {
 public:
-  virtual ~IRenderableObject() = default;
-
   virtual void draw(Shader &shader) = 0;
-
-protected:
-  IRenderableObject() = default;
 };
 
 #endif // RENDERABLE_OBJECT_HPP
