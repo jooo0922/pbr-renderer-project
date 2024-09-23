@@ -51,7 +51,7 @@ void MaterialFeature::onChange(const MaterialParameter &param)
   }
 }
 
-void MaterialFeature::setPbrShader(Shader *pbrShader)
+void MaterialFeature::setPbrShader(std::shared_ptr<Shader> pbrShader)
 {
   pbrShaderPtr = pbrShader;
 }

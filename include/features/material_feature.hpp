@@ -6,6 +6,7 @@
   헤더파일의 헤더가드를 처리하여 중복 include 방지해 줌!
 */
 
+#include <memory>
 #include <glm/glm.hpp>
 #include <features/feature.hpp>
 #include <common/listener.hpp>
@@ -36,10 +37,10 @@ public:
 
   void onChange(const MaterialParameter &param) override;
 
-  void setPbrShader(Shader *pbrShader);
+  void setPbrShader(std::shared_ptr<Shader> pbrShader);
 
 private:
-  Shader *pbrShaderPtr;
+  std::shared_ptr<Shader> pbrShaderPtr;
   float roughness;
   float metallic;
   float ambientOcclusion;
