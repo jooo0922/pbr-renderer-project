@@ -17,6 +17,8 @@
 #include "gl_objects/render_buffer_object.hpp"
 #include "gl_context/gl_context.hpp"
 
+#include "features/material_feature.hpp"
+
 #include <iostream>
 #include <spdlog/spdlog.h>
 
@@ -66,6 +68,13 @@ int main()
   // 배경에 적용할 skybox 를 렌더링하는 쉐이더 객체 생성
   Shader backgroundShader("resources/shaders/background.vs", "resources/shaders/background.fs");
 
+  /* Feature 객체 생성 */
+  MaterialFeature materialFeature;
+
+  /* Feature 객체 초기화 */
+  materialFeature.setPbrShader(&pbrShader);
+  materialFeature.initialize();
+
   /* 각 구체에 공통으로 적용할 PBR Parameter 들을 쉐이더 프로그램에 전송 */
 
   // PBR 쉐이더 프로그램 바인딩
@@ -79,12 +88,6 @@ int main()
 
   // BRDF Integration map 텍스쳐를 바인딩할 2번 texture unit 위치값 전송
   pbrShader.setInt("brdfLUT", 2);
-
-  // 표면 밖으로 빠져나온 diffuse light 색상값을 쉐이더 프로그램에 전송
-  pbrShader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
-
-  // 각 프래그먼트의 ambient occlusion(환경광 차폐) factor 를 1로 지정 -> 즉, 환경광이 차폐되는 영역이 없음!
-  pbrShader.setFloat("ao", 1.0f);
 
   /* skybox 에 적용할 uniform 변수들을 쉐이더 프로그램에 전송 */
 
@@ -122,11 +125,6 @@ int main()
 
   // Quad 객체 생성
   Quad quad;
-
-  // 각 구체의 모델 행렬 계산 시 사용할 구체의 행 수, 열 수, 간격값 초기화
-  int nrRows = 7;
-  int nrColumns = 7;
-  float spacing = 2.5;
 
   /* Equirectangular HDR 파일 > Cubemap 변환 시 필요한 버퍼 생성 및 바인딩 */
 
@@ -435,15 +433,13 @@ int main()
     /* 미리 계산된 split-sum approximation 의 두 번째 적분식 결과값이 저장되어 있는 BRDF Integration map 을 바인딩 */
     brdfLUTTexture.use(GL_TEXTURE2);
 
+    /* 각 Feature 클래스들의 렌더링 루프 작업 수행 */
+    materialFeature.process();
+
     /* 각 Sphere 에 적용할 모델행렬 계산 및 Sphere 렌더링 */
 
     // 모델행렬을 단위행렬로 초기화
     glm::mat4 model = glm::mat4(1.0f);
-
-    pbrShader.setFloat("metallic", 0.0f);
-    pbrShader.setFloat("roughness", 0.5f);
-
-    model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
 
     // 계산된 모델행렬을 쉐이더 프로그램에 전송
@@ -494,6 +490,9 @@ int main()
     glfwImpl.swapBuffers();
     glfwImpl.pollEvents();
   }
+
+  /* 각 Feature 클래스들 종료 */
+  materialFeature.finalize();
 
   return 0;
 }
