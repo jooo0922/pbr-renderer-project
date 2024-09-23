@@ -17,8 +17,9 @@
 #include "gl_objects/render_buffer_object.hpp"
 #include "gl_context/gl_context.hpp"
 
-#include "features/material_feature.hpp"
+#include "app/app.hpp"
 
+#include <memory>
 #include <iostream>
 #include <spdlog/spdlog.h>
 
@@ -45,10 +46,14 @@ int main()
   // GLContext 싱글턴 인스턴스 접근
   GLContext &glContext = GLContext::getInstance();
 
+  /* App 클래스 초기화 */
+  App app;
+  app.initialize();
+
   /* PBR 구현에 필요한 쉐이더 객체 생성 및 컴파일 */
 
-  // 구체 렌더링 시 적용할 PBR 쉐이더 객체 생성
-  Shader pbrShader("resources/shaders/pbr.vs", "resources/shaders/pbr.fs");
+  // TODO : App 클래스 내부에서 동적 할당된 pbrShader 스마트 포인터 참조 -> pbrShader 관련 코드 리팩토링 완료 시 제거 예정
+  std::shared_ptr<Shader> pbrShader = app.getPbrShader();
 
   // 단위 큐브에 적용한 HDR 이미지를 Cubemap 버퍼에 렌더링하는 쉐이더 객체 생성
   Shader equirectangularToCubemapShader("resources/shaders/cubemap.vs", "resources/shaders/equirectangular_to_cubemap.fs");
@@ -68,26 +73,19 @@ int main()
   // 배경에 적용할 skybox 를 렌더링하는 쉐이더 객체 생성
   Shader backgroundShader("resources/shaders/background.vs", "resources/shaders/background.fs");
 
-  /* Feature 객체 생성 */
-  MaterialFeature materialFeature;
-
-  /* Feature 객체 초기화 */
-  materialFeature.setPbrShader(&pbrShader);
-  materialFeature.initialize();
-
   /* 각 구체에 공통으로 적용할 PBR Parameter 들을 쉐이더 프로그램에 전송 */
 
   // PBR 쉐이더 프로그램 바인딩
-  pbrShader.use();
+  pbrShader->use();
 
   // irradiance map 큐브맵 텍스쳐를 바인딩할 0번 texture unit 위치값 전송
-  pbrShader.setInt("irradianceMap", 0);
+  pbrShader->setInt("irradianceMap", 0);
 
   // pre-filtered env map 큐브맵 텍스쳐를 바인딩할 1번 texture unit 위치값 전송
-  pbrShader.setInt("prefilterMap", 1);
+  pbrShader->setInt("prefilterMap", 1);
 
   // BRDF Integration map 텍스쳐를 바인딩할 2번 texture unit 위치값 전송
-  pbrShader.setInt("brdfLUT", 2);
+  pbrShader->setInt("brdfLUT", 2);
 
   /* skybox 에 적용할 uniform 변수들을 쉐이더 프로그램에 전송 */
 
@@ -384,10 +382,10 @@ int main()
   glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
   // 변환행렬을 전송할 PBR 쉐이더 프로그램 바인딩
-  pbrShader.use();
+  pbrShader->use();
 
   // 계산된 투영행렬을 쉐이더 프로그램에 전송
-  pbrShader.setMat4("projection", projection);
+  pbrShader->setMat4("projection", projection);
 
   // 변환행렬을 전송할 skybox 쉐이더 프로그램 바인딩
   backgroundShader.use();
@@ -411,18 +409,18 @@ int main()
     /* 변환행렬 계산 및 쉐이더 객체에 전송 */
 
     // 변환행렬을 전송할 쉐이더 프로그램 바인딩
-    pbrShader.use();
+    pbrShader->use();
 
     // 카메라 클래스로부터 뷰 행렬(= LookAt 행렬) 가져오기
     glm::mat4 view = camera.GetViewMatrix();
 
     // 계산된 뷰 행렬을 쉐이더 프로그램에 전송
-    pbrShader.setMat4("view", view);
+    pbrShader->setMat4("view", view);
 
     /* 기타 uniform 변수들 쉐이더 객체에 전송 */
 
     // 카메라 위치값 쉐이더 프로그램에 전송
-    pbrShader.setVec3("camPos", camera.Position);
+    pbrShader->setVec3("camPos", camera.Position);
 
     /* 미리 계산된 irradiance 가 저장되어 있는 irradianceMap 을 바인딩 */
     irradianceMap.use(GL_TEXTURE0);
@@ -433,8 +431,7 @@ int main()
     /* 미리 계산된 split-sum approximation 의 두 번째 적분식 결과값이 저장되어 있는 BRDF Integration map 을 바인딩 */
     brdfLUTTexture.use(GL_TEXTURE2);
 
-    /* 각 Feature 클래스들의 렌더링 루프 작업 수행 */
-    materialFeature.process();
+    app.process();
 
     /* 각 Sphere 에 적용할 모델행렬 계산 및 Sphere 렌더링 */
 
@@ -443,17 +440,17 @@ int main()
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
 
     // 계산된 모델행렬을 쉐이더 프로그램에 전송
-    pbrShader.setMat4("model", model);
+    pbrShader->setMat4("model", model);
 
     /*
       쉐이더 코드에서 노멀벡터를 World Space 로 변환할 때
       사용할 노멀행렬을 각 구체의 계산된 모델행렬로부터 계산 후,
       쉐이더 코드에 전송
     */
-    pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+    pbrShader->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
 
     // 구체 렌더링
-    sphere.draw(pbrShader);
+    sphere.draw(*pbrShader);
 
     /* 광원 정보 쉐이더 전송 및 광원 위치 시각화를 위한 구체 렌더링 */
 
@@ -467,8 +464,8 @@ int main()
       newPos = lightPositions[i];
 
       // 광원 위치 및 색상 데이터를 쉐이더 프로그램에 전송
-      pbrShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-      pbrShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
+      pbrShader->setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+      pbrShader->setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
     }
 
     /* skybox 렌더링 */
@@ -490,9 +487,6 @@ int main()
     glfwImpl.swapBuffers();
     glfwImpl.pollEvents();
   }
-
-  /* 각 Feature 클래스들 종료 */
-  materialFeature.finalize();
 
   return 0;
 }
