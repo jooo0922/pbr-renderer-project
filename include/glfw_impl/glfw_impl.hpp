@@ -48,6 +48,8 @@ public:
   // GLFW time 반환
   double getTime();
 
+  GLFWwindow *getWindow();
+
 private:
   // GLFWWindow 객체 관련 멤버 변수
   GLFWwindow *window;

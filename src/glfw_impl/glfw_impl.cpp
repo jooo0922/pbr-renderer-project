@@ -132,6 +132,11 @@ double GLFWImpl::getTime()
   return glfwGetTime();
 }
 
+GLFWwindow *GLFWImpl::getWindow()
+{
+  return window;
+}
+
 // GLFWwindow 윈도우 창 리사이징 감지 시, 호출할 콜백 함수 정의
 void GLFWImpl::framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
