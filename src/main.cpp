@@ -18,6 +18,7 @@
 #include "gl_context/gl_context.hpp"
 
 #include "app/app.hpp"
+#include "ui_manager/ui_manager.hpp"
 
 #include <memory>
 #include <iostream>
@@ -49,6 +50,11 @@ int main()
   /* App 클래스 초기화 */
   App app;
   app.initialize();
+
+  /* UiManager 클래스 초기화 */
+  UiManager uiManager;
+  uiManager.initializeWindow(glfwImpl.getWindow());
+  uiManager.initializeControllers(app);
 
   /* PBR 구현에 필요한 쉐이더 객체 생성 및 컴파일 */
 
@@ -484,9 +490,13 @@ int main()
     // brdfShader.use();
     // quad.draw(brdfShader);
 
+    uiManager.process();
+
     glfwImpl.swapBuffers();
     glfwImpl.pollEvents();
   }
+
+  uiManager.finalize();
 
   return 0;
 }
