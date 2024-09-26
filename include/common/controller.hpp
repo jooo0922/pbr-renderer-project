@@ -29,7 +29,7 @@ public:
     parameter = param;
   }
 
-  void getValue() const
+  ParameterType getValue() const
   {
     return parameter;
   }
