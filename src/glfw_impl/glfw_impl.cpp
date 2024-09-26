@@ -68,7 +68,7 @@ int GLFWImpl::init()
   glfwSetScrollCallback(window, [](GLFWwindow *window, double xoffset, double yoffset)
                         { static_cast<GLFWImpl *>(glfwGetWindowUserPointer(window))->scrollCallbackFunc(window, xoffset, yoffset); });
 
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
   {
