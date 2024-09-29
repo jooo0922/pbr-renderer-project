@@ -27,6 +27,13 @@ public:
   void setValue(const ParameterType &param)
   {
     parameter = param;
+    notifyAll();
+  }
+
+  void setValue(const ParameterType &param, const IListener<ParameterType> *not_listening)
+  {
+    parameter = param;
+    notifyAllExceptOne(not_listening);
   }
 
   ParameterType getValue() const
@@ -48,11 +55,22 @@ private:
   ParameterType parameter;
   std::set<IListener<ParameterType> *> listeners;
 
-  void notify()
+  void notifyAll()
   {
     for (auto listener : listeners)
     {
       listener->onChange(parameter);
+    }
+  }
+
+  void notifyAllExceptOne(const IListener<ParameterType> *not_listening)
+  {
+    for (auto listener : listeners)
+    {
+      if (listener != not_listening)
+      {
+        listener->onChange(parameter);
+      }
     }
   }
 };
