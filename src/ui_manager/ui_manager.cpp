@@ -23,10 +23,18 @@ void UiManager::initializeWindow(GLFWwindow *window)
   ImGui_ImplOpenGL3_CreateDeviceObjects();
 }
 
-void UiManager::initializeControllers(App &app)
+void UiManager::initializeUiComponents(App &app)
 {
   appPtr = &app;
 
+  // 각 Controller 객체에 UiContainer 객체를 리스너로 등록
+  appPtr->getMaterialController().addListener(materialUi);
+
+  /**
+   * 각 Controller 객체에 초기화된 파라미터 값들을
+   * (-> App::initializeControllers() 함수에서 초기화됨.)
+   * 리스너로 등록된 ui_containers 내부의 ui_component 요소들의 초기값으로 지정
+   */
   const MaterialParameter materialParameter = appPtr->getMaterialController().getValue();
   appPtr->getMaterialController().setValue(materialParameter);
 }
@@ -38,14 +46,15 @@ void UiManager::process()
   // ImGui 프레임 새로 생성
   ImGui::NewFrame();
 
-  // 테스트용 ImGui 렌더링
   {
-    ImGui::Begin("Hello, ImGui!");         // 창 이름
-    ImGui::Text("This is a simple text."); // 텍스트 표시
+    // MaterialUi 패널 생성
+    ImGui::Begin("Material");
+    if (materialUi.onUiComponents())
+    {
+      onChangeMaterialUi();
+    }
     ImGui::End();
   }
-
-  // TODO : MaterialUi::OnUiComponents() 를 호출하여 입력값 변경 감지 시, onChangeMaterialUi() 호출하는 코드 추가
 
   // ImGui 가 렌더링할 drawData 를 모아 둠.
   ImGui::Render();
@@ -65,9 +74,8 @@ void UiManager::finalize()
 
 void UiManager::onChangeMaterialUi()
 {
+  // MaterialUi 컨테이너로부터 현재 ImGui 입력값을 가져와서 MaterialParameter 에 복사 후 Controller 객체에 notify 전파
   MaterialParameter materialParameter;
-
-  // TODO : MaterialUi 컨테이너로부터 현재 ImGui 입력값을 가져와서 MaterialParameter 에 복사하는 코드 추가
-
-  appPtr->getMaterialController().setValue(materialParameter);
+  materialUi.getMaterialParam(materialParameter);
+  appPtr->getMaterialController().setValue(materialParameter, &materialUi);
 }
