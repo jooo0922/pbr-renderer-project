@@ -14,7 +14,7 @@
  *
  * VBO 객체를 추상화한 클래스
  */
-class VertexBufferObject final : public IGLObject
+class VertexBufferObject : public IGLObject
 {
 public:
   VertexBufferObject();

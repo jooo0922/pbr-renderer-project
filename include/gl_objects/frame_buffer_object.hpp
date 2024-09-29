@@ -14,7 +14,7 @@
  *
  * offscreen rendering 에 사용할 Framebuffer 객체를 추상화한 클래스
  */
-class FrameBufferObject final : public IGLObject
+class FrameBufferObject : public IGLObject
 {
 public:
   FrameBufferObject();

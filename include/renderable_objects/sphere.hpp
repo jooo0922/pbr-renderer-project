@@ -8,7 +8,7 @@
 
 #include "renderable_objects/primitive.hpp"
 
-class Sphere final : public Primitive
+class Sphere : public Primitive
 {
 public:
   // 생성자

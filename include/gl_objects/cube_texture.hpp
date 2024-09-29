@@ -18,7 +18,7 @@
  * -> 현재 프로젝트에서 CubeTexture 는 offscreen rendering 결과를 저장하기 위한
  * 텍스쳐 버퍼 역할만 하고 있으므로, CubeTexture 클래스에는 해당 목적으로만 사용함.
  */
-class CubeTexture final : public IGLObject
+class CubeTexture : public IGLObject
 {
 public:
   // 비어있는 텍스쳐 버퍼 객체 생성 -> offscreen rendering 결과를 저장할 용도

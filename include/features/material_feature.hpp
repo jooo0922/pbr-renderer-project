@@ -26,7 +26,7 @@ struct MaterialParameter
  * Metallic-Roughness workflow 상에서
  * material 관련 파라미터들을 관리하는 Feature 클래스
  */
-class MaterialFeature final : public IFeature, public IListener<MaterialParameter>
+class MaterialFeature : public IFeature, public IListener<MaterialParameter>
 {
 public:
   MaterialFeature();

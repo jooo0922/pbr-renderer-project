@@ -14,7 +14,7 @@
  *
  * Texture 객체를 추상화한 클래스
  */
-class Texture final : public IGLObject
+class Texture : public IGLObject
 {
 public:
   // 이미지 url 을 로드하여 텍스쳐 객체 생성

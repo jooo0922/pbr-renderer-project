@@ -14,7 +14,7 @@
  *
  * offscreen rendering 에 사용할 Renderbuffer 객체를 추상화한 클래스
  */
-class RenderBufferObject final : public IGLObject
+class RenderBufferObject : public IGLObject
 {
 public:
   RenderBufferObject();
