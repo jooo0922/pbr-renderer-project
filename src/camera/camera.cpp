@@ -25,7 +25,7 @@ glm::mat4 Camera::GetViewMatrix()
   return glm::lookAt(Position, Position + Front, Up);
 }
 
-void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
+void Camera::ProcessCameraMove(Camera_Movement direction, float deltaTime)
 {
   float velocity = MovementSpeed * deltaTime;
   if (direction == FORWARD)
@@ -38,7 +38,7 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
     Position += Right * velocity;
 }
 
-void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
+void Camera::ProcessCameraRotate(float xoffset, float yoffset, GLboolean constrainPitch)
 {
   xoffset *= MouseSensitivity;
   yoffset *= MouseSensitivity;
@@ -57,7 +57,7 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
   updateCameraVectors();
 }
 
-void Camera::ProcessMouseScroll(float yoffset)
+void Camera::ProcessCameraZoom(float yoffset)
 {
   Zoom -= (float)yoffset;
   if (Zoom < 1.0f)

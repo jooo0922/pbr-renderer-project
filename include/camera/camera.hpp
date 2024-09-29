@@ -48,14 +48,14 @@ public:
   // 뷰 행렬 반환
   glm::mat4 GetViewMatrix();
 
-  // 키보드 입력 처리
-  void ProcessKeyboard(Camera_Movement direction, float deltaTime);
+  // 카메라 이동 처리
+  void ProcessCameraMove(Camera_Movement direction, float deltaTime);
 
-  // 마우스 이동 처리
-  void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
+  // 카메라 회전 처리
+  void ProcessCameraRotate(float xoffset, float yoffset, GLboolean constrainPitch = true);
 
-  // 마우스 스크롤 처리
-  void ProcessMouseScroll(float yoffset);
+  // 카메라 줌 처리
+  void ProcessCameraZoom(float yoffset);
 
 private:
   // 카메라 벡터들 업데이트

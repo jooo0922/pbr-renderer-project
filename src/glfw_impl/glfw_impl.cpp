@@ -171,13 +171,13 @@ void GLFWImpl::cursorPosCallback(GLFWwindow *window, double xposIn, double yposI
   lastY = ypos;
 
   // 마우스 이동량(offset)에 따른 카메라 오일러 각 재계산 및 카메라 로컬 축 벡터 업데이트
-  camera->ProcessMouseMovement(xoffset, yoffset);
+  camera->ProcessCameraRotate(xoffset, yoffset);
 }
 
 // GLFW 윈도우에 스크롤 입력 감지 시, 호출할 콜백함수 정의
 void GLFWImpl::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
-  camera->ProcessMouseScroll(static_cast<float>(yoffset));
+  camera->ProcessCameraZoom(static_cast<float>(yoffset));
 }
 
 // GLFW 윈도우 및 키 입력 감지 및 이에 대한 반응 처리 함수 구현
@@ -195,19 +195,19 @@ void GLFWImpl::processInput(GLFWwindow *window)
   // 키 입력에 따른 카메라 이동 처리 (GLFW 키 입력 메서드에 독립적인 enum 사용)
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
   {
-    camera->ProcessKeyboard(FORWARD, deltaTime);
+    camera->ProcessCameraMove(FORWARD, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
   {
-    camera->ProcessKeyboard(BACKWARD, deltaTime);
+    camera->ProcessCameraMove(BACKWARD, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
   {
-    camera->ProcessKeyboard(LEFT, deltaTime);
+    camera->ProcessCameraMove(LEFT, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
   {
-    camera->ProcessKeyboard(RIGHT, deltaTime);
+    camera->ProcessCameraMove(RIGHT, deltaTime);
   }
 }
 
