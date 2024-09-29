@@ -52,8 +52,11 @@ void App::initializeFeatures()
 
 void App::initializeControllers()
 {
-  /* Controller 객체 초기화 */
+  /* Controller 객체들의 파라미터 값 초기화 및 리스너 등록 */
 
-  // materialController 초기화
+  // materialController 객채의 파라미터 값 초기화 및 리스너 등록
+  MaterialParameter materialParameter;
+  materialFeature.getMaterialParameter(materialParameter);
   materialController.addListener(materialFeature);
+  materialController.setValue(materialParameter);
 }
