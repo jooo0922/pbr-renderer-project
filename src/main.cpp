@@ -54,7 +54,7 @@ int main()
   /* UiManager 클래스 초기화 */
   UiManager uiManager;
   uiManager.initializeWindow(glfwImpl.getWindow());
-  uiManager.initializeControllers(app);
+  uiManager.initializeUiComponents(app);
 
   /* PBR 구현에 필요한 쉐이더 객체 생성 및 컴파일 */
 
