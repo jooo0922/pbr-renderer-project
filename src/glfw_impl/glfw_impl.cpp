@@ -51,10 +51,10 @@ int GLFWImpl::init()
     // 람다 함수 내에서 실제 콜백 함수 호출
     this->framebufferSizeCallback(window, width, height);
   };
-  cursorPosCallbackFunc = [this](GLFWwindow *window, double xposIn, double yposIn)
-  {
-    this->cursorPosCallback(window, xposIn, yposIn);
-  };
+  // cursorPosCallbackFunc = [this](GLFWwindow *window, double xposIn, double yposIn)
+  // {
+  //   this->cursorPosCallback(window, xposIn, yposIn);
+  // };
   scrollCallbackFunc = [this](GLFWwindow *window, double xoffset, double yoffset)
   {
     this->scrollCallback(window, xoffset, yoffset);
@@ -63,8 +63,10 @@ int GLFWImpl::init()
   // 함수 포인터에 저장한 람다 함수를 GLFW 콜백 함수로 등록 (하단 필기 참고)
   glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height)
                                  { static_cast<GLFWImpl *>(glfwGetWindowUserPointer(window))->framebufferSizeCallbackFunc(window, width, height); });
-  glfwSetCursorPosCallback(window, [](GLFWwindow *window, double xposIn, double yposIn)
-                           { static_cast<GLFWImpl *>(glfwGetWindowUserPointer(window))->cursorPosCallbackFunc(window, xposIn, yposIn); });
+  // 마우스 이동 콜백함수 등록 비활성화
+  // TODO : 마우스 이동에 의한 카메라 제어를 ImGui 입력에 의한 카메라 제어로 대체
+  // glfwSetCursorPosCallback(window, [](GLFWwindow *window, double xposIn, double yposIn)
+  //                          { static_cast<GLFWImpl *>(glfwGetWindowUserPointer(window))->cursorPosCallbackFunc(window, xposIn, yposIn); });
   glfwSetScrollCallback(window, [](GLFWwindow *window, double xoffset, double yoffset)
                         { static_cast<GLFWImpl *>(glfwGetWindowUserPointer(window))->scrollCallbackFunc(window, xoffset, yoffset); });
 
