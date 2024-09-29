@@ -17,7 +17,22 @@ void UiManager::initializeWindow(GLFWwindow *window)
   ImGui::SetCurrentContext(imguiContext);
   ImGui::StyleColorsDark();
 
-  ImGui_ImplGlfw_InitForOpenGL(window, false);
+  // ImGui 플래그 설정
+  ImGuiIO &io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+  /**
+   * ImGui_ImplGlfw_InitForOpenGL(window, true);
+   *
+   * 위 함수에서 두 번째 매개변수를 true 로 지정함으로써,
+   * ImGui 내부에서의 GLFW 입력 콜백을 자동으로 처리하도록 함.
+   *
+   * 이것을 활성화해야 ImGui 내부에 정의된 입력 이벤트 콜백이 정상 작동함.
+   *
+   * -> 단, ImGui 입력 이벤트 콜백을 자동 처리할 경우,
+   * 사용자가 glfwGetKey() 함수로 직접 정의한 입력 처리는 비활성화하는 것이 좋음.
+   */
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init(glsl_version);
   ImGui_ImplOpenGL3_CreateFontsTexture();
   ImGui_ImplOpenGL3_CreateDeviceObjects();
