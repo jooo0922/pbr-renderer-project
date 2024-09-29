@@ -113,8 +113,8 @@ void GLFWImpl::process()
   // 마지막 프레임 경과시간을 현재 프레임 경과시간으로 업데이트!
   lastFrame = currentFrame;
 
-  // 윈도우 창 및 키 입력 감지 밎 이벤트 처리
-  processInput(window);
+  // ImGui 의 GLFW 입력 콜백 자동 처리와 충돌 방지를 위해 윈도우 창 및 키 입력 감지 밎 이벤트 처리 비활성화
+  // processInput(window);
 }
 
 void GLFWImpl::swapBuffers()
