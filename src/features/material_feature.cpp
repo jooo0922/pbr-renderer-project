@@ -1,16 +1,18 @@
 #include "features/material_feature.hpp"
 
 MaterialFeature::MaterialFeature()
-    : pbrShaderPtr(nullptr),
-      roughness(0.5f),
-      metallic(0.0f),
-      ambientOcclusion(1.0f), // 각 프래그먼트의 ambient occlusion(환경광 차폐) factor 를 1로 지정 -> 즉, 환경광이 차폐되는 영역이 없음!
-      albedo(glm::vec3(0.5f, 0.0f, 0.0f))
+    : pbrShaderPtr(nullptr)
 {
 }
 
 void MaterialFeature::initialize()
 {
+  // MaterialUi 에서 관리되는 각 ImGui 요소에 입력할 초기값 설정
+  // TODO : 추후에 초기값을 별도 파일에 constant 로 추출하여 정리할 것.
+  materialParameter.roughness = 0.5f;
+  materialParameter.metallic = 0.0f;
+  materialParameter.ambientOcclusion = 1.0f; // 각 프래그먼트의 ambient occlusion(환경광 차폐) factor 를 1로 지정 -> 즉, 환경광이 차폐되는 영역이 없음!
+  materialParameter.albedo = glm::vec3(0.5f, 0.0f, 0.0f);
 }
 
 void MaterialFeature::process()
@@ -49,11 +51,18 @@ void MaterialFeature::onChange(const MaterialParameter &param)
   {
     setAlbedo(param.albedo);
   }
+
+  materialParameter = param;
 }
 
 void MaterialFeature::setPbrShader(std::shared_ptr<Shader> pbrShader)
 {
   pbrShaderPtr = pbrShader;
+}
+
+void MaterialFeature::getMaterialParameter(MaterialParameter &param) const
+{
+  param = materialParameter;
 }
 
 void MaterialFeature::setRoughness(const float value)

@@ -39,12 +39,16 @@ public:
 
   void setPbrShader(std::shared_ptr<Shader> pbrShader);
 
+  void getMaterialParameter(MaterialParameter &param) const;
+
 private:
   std::shared_ptr<Shader> pbrShaderPtr;
   float roughness;
   float metallic;
   float ambientOcclusion;
   glm::vec3 albedo;
+
+  MaterialParameter materialParameter;
 
   // 파라미터 Setter 멤버 함수
   void setRoughness(const float value);
