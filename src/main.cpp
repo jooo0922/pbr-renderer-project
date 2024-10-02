@@ -6,7 +6,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "shader/shader.hpp"
-#include "camera/camera.hpp"
 #include "glfw_impl/glfw_impl.hpp"
 #include "renderable_objects/sphere.hpp"
 #include "renderable_objects/cube.hpp"
@@ -29,11 +28,8 @@ int main()
   // 앱 시작
   spdlog::info("Starting the application");
 
-  // 카메라 클래스 생성 (카메라 위치값만 매개변수로 전달함.)
-  Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
   // GLFWImpl 객체 생성
-  GLFWImpl glfwImpl(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, &camera);
+  GLFWImpl glfwImpl(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME);
 
   // GLFWImpl 초기화
   if (glfwImpl.init() != 0)
@@ -58,8 +54,9 @@ int main()
 
   /* PBR 구현에 필요한 쉐이더 객체 생성 및 컴파일 */
 
-  // TODO : App 클래스 내부에서 동적 할당된 pbrShader 스마트 포인터 참조 -> pbrShader 관련 코드 리팩토링 완료 시 제거 예정
+  // TODO : App 클래스 내부에서 동적 할당된 각 Shader 객체의 스마트 포인터 참조 -> 각 Shader 관련 코드 리팩토링 완료 시 제거 예정
   std::shared_ptr<Shader> pbrShader = app.getPbrShader();
+  std::shared_ptr<Shader> backgroundShader = app.getBackgroundShader();
 
   // 단위 큐브에 적용한 HDR 이미지를 Cubemap 버퍼에 렌더링하는 쉐이더 객체 생성
   Shader equirectangularToCubemapShader("resources/shaders/cubemap.vs", "resources/shaders/equirectangular_to_cubemap.fs");
@@ -75,9 +72,6 @@ int main()
 
   // split sum approximation 의 두 번째 적분식의 결과값(= BRDF Integration map)을 LUTTexture 버퍼에 렌더링하는 쉐이더 객체 생성
   Shader brdfShader("resources/shaders/brdf.vs", "resources/shaders/brdf.fs");
-
-  // 배경에 적용할 skybox 를 렌더링하는 쉐이더 객체 생성
-  Shader backgroundShader("resources/shaders/background.vs", "resources/shaders/background.fs");
 
   /* 각 구체에 공통으로 적용할 PBR Parameter 들을 쉐이더 프로그램에 전송 */
 
@@ -96,10 +90,10 @@ int main()
   /* skybox 에 적용할 uniform 변수들을 쉐이더 프로그램에 전송 */
 
   // skybox 쉐이더 프로그램 바인딩
-  backgroundShader.use();
+  backgroundShader->use();
 
   // HDR 이미지 데이터가 렌더링된 큐브맵 텍스쳐를 바인딩할 0번 texture unit 위치값 전송
-  backgroundShader.setInt("environmentMap", 0);
+  backgroundShader->setInt("environmentMap", 0);
 
   /* 광원 데이터 초기화 */
   // TODO : Light 클래스 추상화 -> Light 관련 Feature 클래스 구현 시 추상화할 것.
@@ -379,26 +373,6 @@ int main()
   // BRDF Integration map 버퍼에 렌더링 완료 후, 기본 프레임버퍼로 바인딩 초기화
   captureFBO.unbind();
 
-  /*
-    투영행렬을 렌더링 루프 이전에 미리 계산
-    -> why? camera zoom-in/out 미적용 시, 투영행렬 재계산 불필요!
-  */
-
-  // 카메라의 zoom 값으로부터 투영 행렬 계산
-  glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-
-  // 변환행렬을 전송할 PBR 쉐이더 프로그램 바인딩
-  pbrShader->use();
-
-  // 계산된 투영행렬을 쉐이더 프로그램에 전송
-  pbrShader->setMat4("projection", projection);
-
-  // 변환행렬을 전송할 skybox 쉐이더 프로그램 바인딩
-  backgroundShader.use();
-
-  // 계산된 투영행렬을 쉐이더 프로그램에 전송
-  backgroundShader.setMat4("projection", projection);
-
   glfwImpl.restoreViewport();
 
   // while 문으로 렌더링 루프 구현
@@ -412,22 +386,6 @@ int main()
 
     /* 여기서부터 루프에서 실행시킬 모든 렌더링 명령(rendering commands)을 작성함. */
 
-    /* 변환행렬 계산 및 쉐이더 객체에 전송 */
-
-    // 변환행렬을 전송할 쉐이더 프로그램 바인딩
-    pbrShader->use();
-
-    // 카메라 클래스로부터 뷰 행렬(= LookAt 행렬) 가져오기
-    glm::mat4 view = camera.GetViewMatrix();
-
-    // 계산된 뷰 행렬을 쉐이더 프로그램에 전송
-    pbrShader->setMat4("view", view);
-
-    /* 기타 uniform 변수들 쉐이더 객체에 전송 */
-
-    // 카메라 위치값 쉐이더 프로그램에 전송
-    pbrShader->setVec3("camPos", camera.Position);
-
     /* 미리 계산된 irradiance 가 저장되어 있는 irradianceMap 을 바인딩 */
     irradianceMap.use(GL_TEXTURE0);
 
@@ -440,6 +398,8 @@ int main()
     app.process();
 
     /* 각 Sphere 에 적용할 모델행렬 계산 및 Sphere 렌더링 */
+
+    pbrShader->use();
 
     // 모델행렬을 단위행렬로 초기화
     glm::mat4 model = glm::mat4(1.0f);
@@ -477,14 +437,13 @@ int main()
     /* skybox 렌더링 */
 
     // skybox 쉐이더 프로그램 바인딩 및 현재 카메라의 view 행렬 전송
-    backgroundShader.use();
-    backgroundShader.setMat4("view", view);
+    backgroundShader->use();
 
     // HDR 큐브맵 텍스쳐를 0번 texture unit 에 바인딩하여 skybox 텍스쳐로 사용
     envCubemap.use(GL_TEXTURE0);
 
     // skybox 렌더링
-    cube.draw(backgroundShader);
+    cube.draw(*backgroundShader);
 
     // BRDF Integration map 을 실제로 화면에 렌더링해서 제대로 생성되었는지 확인
     // brdfShader.use();
