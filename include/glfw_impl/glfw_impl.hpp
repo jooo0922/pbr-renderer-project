@@ -10,9 +10,6 @@
 #include <GLFW/glfw3.h> // OpenGL 컨텍스트 생성, 윈도우 생성, 사용자 입력 처리 관련 OpenGL 라이브러리
 #include <spdlog/spdlog.h>
 
-// 클래스 전방 선언
-class Camera;
-
 /**
  * GLFWImpl 클래스
  *
@@ -22,7 +19,7 @@ class GLFWImpl
 {
 public:
   // 생성자
-  GLFWImpl(int width, int height, const char *title, Camera *camera);
+  GLFWImpl(int width, int height, const char *title);
 
   // 소멸자
   ~GLFWImpl();
@@ -63,7 +60,6 @@ private:
   bool firstMouse;
 
   // 카메라 및 시간 관련 멤버 변수
-  Camera *camera;
   float deltaTime; // 마지막에 그려진 프레임 ~ 현재 프레임 사이의 시간 간격
   float lastFrame; // 마지막에 그려진 프레임의 ElapsedTime(경과시간)
 
