@@ -8,6 +8,7 @@ App::~App()
 {
   /* 각 Feature 클래스들 종료 */
   materialFeature.finalize();
+  cameraFeature.finalize();
 }
 
 void App::initialize()
@@ -21,6 +22,7 @@ void App::process()
 {
   /* 각 Feature 클래스들의 렌더링 루프 작업 수행 */
   materialFeature.process();
+  cameraFeature.process();
 }
 
 std::shared_ptr<Shader> App::getPbrShader() const
@@ -28,9 +30,19 @@ std::shared_ptr<Shader> App::getPbrShader() const
   return pbrShader;
 }
 
+std::shared_ptr<Shader> App::getBackgroundShader() const
+{
+  return backgroundShader;
+}
+
 Controller<MaterialParameter> &App::getMaterialController()
 {
   return materialController;
+}
+
+Controller<CameraParameter> &App::getCameraController()
+{
+  return cameraController;
 }
 
 void App::initializeShaders()
@@ -39,6 +51,9 @@ void App::initializeShaders()
 
   // 구체 렌더링 시 적용할 PBR 쉐이더 객체 생성
   pbrShader = std::make_shared<Shader>("resources/shaders/pbr.vs", "resources/shaders/pbr.fs");
+
+  // 배경에 적용할 skybox 를 렌더링하는 쉐이더 객체 생성
+  backgroundShader = std::make_shared<Shader>("resources/shaders/background.vs", "resources/shaders/background.fs");
 }
 
 void App::initializeFeatures()
@@ -48,6 +63,11 @@ void App::initializeFeatures()
   // materialFeature 초기화
   materialFeature.setPbrShader(pbrShader);
   materialFeature.initialize();
+
+  // cameraFeature 초기화
+  cameraFeature.setPbrShader(pbrShader);
+  cameraFeature.setBackgroundShader(backgroundShader);
+  cameraFeature.initialize();
 }
 
 void App::initializeControllers()
@@ -59,4 +79,10 @@ void App::initializeControllers()
   materialFeature.getMaterialParameter(materialParameter);
   materialController.addListener(materialFeature);
   materialController.setValue(materialParameter);
+
+  // cameraController 객채의 파라미터 값 초기화 및 리스너 등록
+  CameraParameter cameraParameter;
+  cameraFeature.getCameraParameter(cameraParameter);
+  cameraController.addListener(cameraFeature);
+  cameraController.setValue(cameraParameter);
 }
