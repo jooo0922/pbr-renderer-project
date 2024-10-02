@@ -66,6 +66,43 @@ void Camera::ProcessCameraZoom(float yoffset)
     Zoom = 45.0f;
 }
 
+void Camera::SetCameraYaw(const float yaw)
+{
+  Yaw = yaw;
+
+  updateCameraVectors();
+}
+
+void Camera::SetCameraPitch(const float pitch, GLboolean constrainPitch)
+{
+  Pitch = pitch;
+
+  if (constrainPitch)
+  {
+    if (Pitch > 89.0f)
+      Pitch = 89.0f;
+    if (Pitch < -89.0f)
+      Pitch = -89.0f;
+  }
+
+  updateCameraVectors();
+}
+
+void Camera::SetCameraZoom(const float zoom)
+{
+  Zoom = zoom;
+
+  if (Zoom < 1.0f)
+    Zoom = 1.0f;
+  if (Zoom > 45.0f)
+    Zoom = 45.0f;
+}
+
+void Camera::SetCameraPosition(const glm::vec3 &position)
+{
+  Position = position;
+}
+
 void Camera::updateCameraVectors()
 {
   glm::vec3 front;

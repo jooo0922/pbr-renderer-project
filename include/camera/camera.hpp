@@ -57,6 +57,18 @@ public:
   // 카메라 줌 처리
   void ProcessCameraZoom(float yoffset);
 
+  // 카메라 Yaw 설정
+  void SetCameraYaw(const float yaw);
+
+  // 키메라 Pitch 설정
+  void SetCameraPitch(const float pitch, GLboolean constrainPitch = true);
+
+  // 카메라 Zoom 설정
+  void SetCameraZoom(const float zoom);
+
+  // 카메라 위치 설정
+  void SetCameraPosition(const glm::vec3 &position);
+
 private:
   // 카메라 벡터들 업데이트
   void updateCameraVectors();
