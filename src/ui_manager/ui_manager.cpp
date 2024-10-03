@@ -44,6 +44,7 @@ void UiManager::initializeUiComponents(App &app)
 
   // 각 Controller 객체에 UiContainer 객체를 리스너로 등록
   appPtr->getMaterialController().addListener(materialUi);
+  appPtr->getCameraController().addListener(cameraUi);
 
   /**
    * 각 Controller 객체에 초기화된 파라미터 값들을
@@ -52,6 +53,9 @@ void UiManager::initializeUiComponents(App &app)
    */
   const MaterialParameter materialParameter = appPtr->getMaterialController().getValue();
   appPtr->getMaterialController().setValue(materialParameter);
+
+  const CameraParameter cameraParameter = appPtr->getCameraController().getValue();
+  appPtr->getCameraController().setValue(cameraParameter);
 }
 
 void UiManager::process()
@@ -67,6 +71,14 @@ void UiManager::process()
     if (materialUi.onUiComponents())
     {
       onChangeMaterialUi();
+    }
+    ImGui::End();
+
+    // CameraUi 패널 생성
+    ImGui::Begin("Camera");
+    if (cameraUi.onUiComponents())
+    {
+      onChangeCameraUi();
     }
     ImGui::End();
   }
@@ -93,4 +105,12 @@ void UiManager::onChangeMaterialUi()
   MaterialParameter materialParameter;
   materialUi.getMaterialParam(materialParameter);
   appPtr->getMaterialController().setValue(materialParameter, &materialUi);
+}
+
+void UiManager::onChangeCameraUi()
+{
+  // CameraUi 컨테이너로부터 현재 ImGui 입력값을 가져와서 MaterialParameter 에 복사 후 Controller 객체에 notify 전파
+  CameraParameter cameraParameter;
+  cameraUi.getCameraParam(cameraParameter);
+  appPtr->getCameraController().setValue(cameraParameter, &cameraUi);
 }
