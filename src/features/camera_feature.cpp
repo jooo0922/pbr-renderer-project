@@ -20,7 +20,7 @@ void CameraFeature::initialize()
 void CameraFeature::process()
 {
   // 카메라의 zoom 값으로부터 투영 행렬 계산
-  glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+  glm::mat4 projection = glm::perspective(glm::radians(camera.GetCameraZoom()), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
   // 카메라 클래스로부터 뷰 행렬(= LookAt 행렬) 가져오기
   glm::mat4 view = camera.GetViewMatrix();
@@ -31,7 +31,7 @@ void CameraFeature::process()
   pbrShaderPtr->setMat4("view", view);
 
   // pbrShader 쉐이더 프로그램에 카메라 위치값 전송
-  pbrShaderPtr->setVec3("camPos", camera.Position);
+  pbrShaderPtr->setVec3("camPos", camera.GetCameraPosition());
 
   // skybox 쉐이더 프로그램 바인딩 및 현재 카메라의 projection 및 view 행렬 전송
   backgroundShaderPtr->use();
@@ -47,22 +47,22 @@ void CameraFeature::finalize()
 
 void CameraFeature::onChange(const CameraParameter &param)
 {
-  if (camera.Yaw != param.yaw)
+  if (camera.GetCameraYaw() != param.yaw)
   {
     setYaw(param.yaw);
   }
 
-  if (camera.Pitch != param.pitch)
+  if (camera.GetCameraPitch() != param.pitch)
   {
     setPitch(param.pitch);
   }
 
-  if (camera.Zoom != param.zoom)
+  if (camera.GetCameraZoom() != param.zoom)
   {
     setZoom(param.zoom);
   }
 
-  if (camera.Position != param.position)
+  if (camera.GetCameraPosition() != param.position)
   {
     setPosition(param.position);
   }
@@ -87,20 +87,20 @@ void CameraFeature::getCameraParameter(CameraParameter &param) const
 
 void CameraFeature::setYaw(const float value)
 {
-  camera.Yaw = value;
+  camera.SetCameraYaw(value);
 }
 
 void CameraFeature::setPitch(const float value)
 {
-  camera.Pitch = value;
+  camera.SetCameraPitch(value);
 }
 
 void CameraFeature::setZoom(const float value)
 {
-  camera.Zoom = value;
+  camera.SetCameraZoom(value);
 }
 
 void CameraFeature::setPosition(const glm::vec3 &position)
 {
-  camera.Position = position;
+  camera.SetCameraPosition(position);
 }
