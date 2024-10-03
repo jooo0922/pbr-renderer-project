@@ -51,10 +51,10 @@ private:
   MaterialParameter materialParameter;
 
   // 파라미터 Setter 멤버 함수
-  void setRoughness(const float value);
-  void setMetallic(const float value);
-  void setAmbientOcclusion(const float value);
-  void setAlbedo(const glm::vec3 &color);
+  void setRoughness(const float roughness);
+  void setMetallic(const float metallic);
+  void setAmbientOcclusion(const float ambientOcclusion);
+  void setAlbedo(const glm::vec3 &albedo);
 };
 
 #endif // MATERIAL_FEATURE_HPP

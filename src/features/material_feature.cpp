@@ -65,22 +65,22 @@ void MaterialFeature::getMaterialParameter(MaterialParameter &param) const
   param = materialParameter;
 }
 
-void MaterialFeature::setRoughness(const float value)
+void MaterialFeature::setRoughness(const float roughness)
 {
-  roughness = value;
+  this->roughness = roughness;
 }
 
-void MaterialFeature::setMetallic(const float value)
+void MaterialFeature::setMetallic(const float metallic)
 {
-  metallic = value;
+  this->metallic = metallic;
 }
 
-void MaterialFeature::setAmbientOcclusion(const float value)
+void MaterialFeature::setAmbientOcclusion(const float ambientOcclusion)
 {
-  ambientOcclusion = value;
+  this->ambientOcclusion = ambientOcclusion;
 }
 
-void MaterialFeature::setAlbedo(const glm::vec3 &color)
+void MaterialFeature::setAlbedo(const glm::vec3 &albedo)
 {
-  albedo = color;
+  this->albedo = albedo;
 }
