@@ -20,10 +20,10 @@ void CameraFeature::initialize()
 void CameraFeature::process()
 {
   // 카메라의 zoom 값으로부터 투영 행렬 계산
-  glm::mat4 projection = glm::perspective(glm::radians(camera.GetCameraZoom()), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+  glm::mat4 projection = glm::perspective(glm::radians(camera.getCameraZoom()), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
   // 카메라 클래스로부터 뷰 행렬(= LookAt 행렬) 가져오기
-  glm::mat4 view = camera.GetViewMatrix();
+  glm::mat4 view = camera.getViewMatrix();
 
   // pbrShader 쉐이더 프로그램 바인딩 및 현재 카메라의 projection 및 view 행렬 전송
   pbrShaderPtr->use();
@@ -31,7 +31,7 @@ void CameraFeature::process()
   pbrShaderPtr->setMat4("view", view);
 
   // pbrShader 쉐이더 프로그램에 카메라 위치값 전송
-  pbrShaderPtr->setVec3("camPos", camera.GetCameraPosition());
+  pbrShaderPtr->setVec3("camPos", camera.getCameraPosition());
 
   // skybox 쉐이더 프로그램 바인딩 및 현재 카메라의 projection 및 view 행렬 전송
   backgroundShaderPtr->use();
@@ -47,22 +47,22 @@ void CameraFeature::finalize()
 
 void CameraFeature::onChange(const CameraParameter &param)
 {
-  if (camera.GetCameraYaw() != param.yaw)
+  if (camera.getCameraYaw() != param.yaw)
   {
     setYaw(param.yaw);
   }
 
-  if (camera.GetCameraPitch() != param.pitch)
+  if (camera.getCameraPitch() != param.pitch)
   {
     setPitch(param.pitch);
   }
 
-  if (camera.GetCameraZoom() != param.zoom)
+  if (camera.getCameraZoom() != param.zoom)
   {
     setZoom(param.zoom);
   }
 
-  if (camera.GetCameraPosition() != param.position)
+  if (camera.getCameraPosition() != param.position)
   {
     setPosition(param.position);
   }
@@ -87,20 +87,20 @@ void CameraFeature::getCameraParameter(CameraParameter &param) const
 
 void CameraFeature::setYaw(const float value)
 {
-  camera.SetCameraYaw(value);
+  camera.setCameraYaw(value);
 }
 
 void CameraFeature::setPitch(const float value)
 {
-  camera.SetCameraPitch(value);
+  camera.setCameraPitch(value);
 }
 
 void CameraFeature::setZoom(const float value)
 {
-  camera.SetCameraZoom(value);
+  camera.setCameraZoom(value);
 }
 
 void CameraFeature::setPosition(const glm::vec3 &position)
 {
-  camera.SetCameraPosition(position);
+  camera.setCameraPosition(position);
 }

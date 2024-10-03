@@ -1,136 +1,136 @@
 #include "camera/camera.hpp"
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
-    : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+    : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM)
 {
-  Position = position;
-  WorldUp = up;
-  Yaw = yaw;
-  Pitch = pitch;
+  this->position = position;
+  this->worldUp = up;
+  this->yaw = yaw;
+  this->pitch = pitch;
   updateCameraVectors();
 }
 
 Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch)
-    : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+    : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM)
 {
-  Position = glm::vec3(posX, posY, posZ);
-  WorldUp = glm::vec3(upX, upY, upZ);
-  Yaw = yaw;
-  Pitch = pitch;
+  this->position = glm::vec3(posX, posY, posZ);
+  this->worldUp = glm::vec3(upX, upY, upZ);
+  this->yaw = yaw;
+  this->pitch = pitch;
   updateCameraVectors();
 }
 
-glm::mat4 Camera::GetViewMatrix()
+glm::mat4 Camera::getViewMatrix()
 {
-  return glm::lookAt(Position, Position + Front, Up);
+  return glm::lookAt(position, position + front, up);
 }
 
-glm::vec3 Camera::GetCameraPosition() const
+glm::vec3 Camera::getCameraPosition() const
 {
-  return Position;
+  return position;
 }
 
-float Camera::GetCameraYaw() const
+float Camera::getCameraYaw() const
 {
-  return Yaw;
+  return yaw;
 }
 
-float Camera::GetCameraPitch() const
+float Camera::getCameraPitch() const
 {
-  return Pitch;
+  return pitch;
 }
 
-float Camera::GetCameraZoom() const
+float Camera::getCameraZoom() const
 {
-  return Zoom;
+  return zoom;
 }
 
-void Camera::ProcessCameraMove(Camera_Movement direction, float deltaTime)
+void Camera::processCameraMove(Camera_Movement direction, float deltaTime)
 {
-  float velocity = MovementSpeed * deltaTime;
+  float velocity = movementSpeed * deltaTime;
   if (direction == FORWARD)
-    Position += Front * velocity;
+    position += front * velocity;
   if (direction == BACKWARD)
-    Position -= Front * velocity;
+    position -= front * velocity;
   if (direction == LEFT)
-    Position -= Right * velocity;
+    position -= right * velocity;
   if (direction == RIGHT)
-    Position += Right * velocity;
+    position += right * velocity;
 }
 
-void Camera::ProcessCameraRotate(float xoffset, float yoffset, GLboolean constrainPitch)
+void Camera::processCameraRotate(float xoffset, float yoffset, GLboolean constrainPitch)
 {
-  xoffset *= MouseSensitivity;
-  yoffset *= MouseSensitivity;
+  xoffset *= mouseSensitivity;
+  yoffset *= mouseSensitivity;
 
-  Yaw += xoffset;
-  Pitch += yoffset;
+  yaw += xoffset;
+  pitch += yoffset;
 
   if (constrainPitch)
   {
-    if (Pitch > 89.0f)
-      Pitch = 89.0f;
-    if (Pitch < -89.0f)
-      Pitch = -89.0f;
+    if (pitch > 89.0f)
+      pitch = 89.0f;
+    if (pitch < -89.0f)
+      pitch = -89.0f;
   }
 
   updateCameraVectors();
 }
 
-void Camera::ProcessCameraZoom(float yoffset)
+void Camera::processCameraZoom(float yoffset)
 {
-  Zoom -= (float)yoffset;
-  if (Zoom < 1.0f)
-    Zoom = 1.0f;
-  if (Zoom > 45.0f)
-    Zoom = 45.0f;
+  zoom -= (float)yoffset;
+  if (zoom < 1.0f)
+    zoom = 1.0f;
+  if (zoom > 45.0f)
+    zoom = 45.0f;
 }
 
-void Camera::SetCameraYaw(const float yaw)
+void Camera::setCameraYaw(const float yaw)
 {
-  Yaw = yaw;
+  this->yaw = yaw;
 
   updateCameraVectors();
 }
 
-void Camera::SetCameraPitch(const float pitch, GLboolean constrainPitch)
+void Camera::setCameraPitch(const float pitch, GLboolean constrainPitch)
 {
-  Pitch = pitch;
+  this->pitch = pitch;
 
   if (constrainPitch)
   {
-    if (Pitch > 89.0f)
-      Pitch = 89.0f;
-    if (Pitch < -89.0f)
-      Pitch = -89.0f;
+    if (this->pitch > 89.0f)
+      this->pitch = 89.0f;
+    if (this->pitch < -89.0f)
+      this->pitch = -89.0f;
   }
 
   updateCameraVectors();
 }
 
-void Camera::SetCameraZoom(const float zoom)
+void Camera::setCameraZoom(const float zoom)
 {
-  Zoom = zoom;
+  this->zoom = zoom;
 
-  if (Zoom < 1.0f)
-    Zoom = 1.0f;
-  if (Zoom > 45.0f)
-    Zoom = 45.0f;
+  if (this->zoom < 1.0f)
+    this->zoom = 1.0f;
+  if (this->zoom > 45.0f)
+    this->zoom = 45.0f;
 }
 
-void Camera::SetCameraPosition(const glm::vec3 &position)
+void Camera::setCameraPosition(const glm::vec3 &position)
 {
-  Position = position;
+  this->position = position;
 }
 
 void Camera::updateCameraVectors()
 {
-  glm::vec3 front;
-  front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-  front.y = sin(glm::radians(Pitch));
-  front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-  Front = glm::normalize(front);
+  glm::vec3 direction;
+  direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+  direction.y = sin(glm::radians(pitch));
+  direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+  front = glm::normalize(direction);
 
-  Right = glm::normalize(glm::cross(Front, WorldUp));
-  Up = glm::normalize(glm::cross(Right, Front));
+  right = glm::normalize(glm::cross(front, worldUp));
+  up = glm::normalize(glm::cross(right, front));
 }
