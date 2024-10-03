@@ -85,19 +85,19 @@ void CameraFeature::getCameraParameter(CameraParameter &param) const
   param = cameraParameter;
 }
 
-void CameraFeature::setYaw(const float value)
+void CameraFeature::setYaw(const float yaw)
 {
-  camera.setCameraYaw(value);
+  camera.setCameraYaw(yaw);
 }
 
-void CameraFeature::setPitch(const float value)
+void CameraFeature::setPitch(const float pitch)
 {
-  camera.setCameraPitch(value);
+  camera.setCameraPitch(pitch);
 }
 
-void CameraFeature::setZoom(const float value)
+void CameraFeature::setZoom(const float zoom)
 {
-  camera.setCameraZoom(value);
+  camera.setCameraZoom(zoom);
 }
 
 void CameraFeature::setPosition(const glm::vec3 &position)

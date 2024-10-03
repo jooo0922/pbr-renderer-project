@@ -51,9 +51,9 @@ private:
   CameraParameter cameraParameter;
 
   // 파라미터 Setter 멤버 함수
-  void setYaw(const float value);
-  void setPitch(const float value);
-  void setZoom(const float value);
+  void setYaw(const float yaw);
+  void setPitch(const float pitch);
+  void setZoom(const float zoom);
   void setPosition(const glm::vec3 &position);
 };
 
