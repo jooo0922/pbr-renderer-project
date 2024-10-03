@@ -5,22 +5,22 @@ CameraUi::CameraUi()
   yaw.setLabel("yaw");
   yaw.setMin(-180.f);
   yaw.setMax(180.f);
-  yaw.setSpeed(1.f);
+  yaw.setSpeed(0.1f);
 
   pitch.setLabel("pitch");
   pitch.setMin(-89.f);
   pitch.setMax(89.f);
-  pitch.setSpeed(1.f);
+  pitch.setSpeed(0.1f);
 
   zoom.setLabel("zoom");
   zoom.setMin(1.f);
   zoom.setMax(45.f);
-  zoom.setSpeed(1.f);
+  zoom.setSpeed(0.1f);
 
   position.setLabel("position");
-  position.setMin(-50.f);
-  position.setMax(50.f);
-  position.setSpeed(1.f);
+  position.setMin(-100.f);
+  position.setMax(100.f);
+  position.setSpeed(0.1f);
 }
 
 CameraUi::~CameraUi()
