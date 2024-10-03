@@ -25,28 +25,24 @@ const float ZOOM = 45.0f;
 class Camera
 {
 public:
-  // 카메라 벡터들
-  glm::vec3 Position;
-  glm::vec3 Front;
-  glm::vec3 Up;
-  glm::vec3 Right;
-  glm::vec3 WorldUp;
-
-  // 오일러 각
-  float Yaw;
-  float Pitch;
-
-  // 이동 속도, 마우스 감도, 줌 레벨
-  float MovementSpeed;
-  float MouseSensitivity;
-  float Zoom;
-
   // 생성자들
   Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);
   Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
   // 뷰 행렬 반환
   glm::mat4 GetViewMatrix();
+
+  // 카메라 Position getter
+  glm::vec3 GetCameraPosition() const;
+
+  // 카메라 Yaw getter
+  float GetCameraYaw() const;
+
+  // 카메라 Pitch getter
+  float GetCameraPitch() const;
+
+  // 카메라 Zoom getter
+  float GetCameraZoom() const;
 
   // 카메라 이동 처리
   void ProcessCameraMove(Camera_Movement direction, float deltaTime);
@@ -70,6 +66,22 @@ public:
   void SetCameraPosition(const glm::vec3 &position);
 
 private:
+  // 카메라 벡터들
+  glm::vec3 Position;
+  glm::vec3 Front;
+  glm::vec3 Up;
+  glm::vec3 Right;
+  glm::vec3 WorldUp;
+
+  // 오일러 각
+  float Yaw;
+  float Pitch;
+
+  // 이동 속도, 마우스 감도, 줌 레벨
+  float MovementSpeed;
+  float MouseSensitivity;
+  float Zoom;
+
   // 카메라 벡터들 업데이트
   void updateCameraVectors();
 };

@@ -25,6 +25,26 @@ glm::mat4 Camera::GetViewMatrix()
   return glm::lookAt(Position, Position + Front, Up);
 }
 
+glm::vec3 Camera::GetCameraPosition() const
+{
+  return Position;
+}
+
+float Camera::GetCameraYaw() const
+{
+  return Yaw;
+}
+
+float Camera::GetCameraPitch() const
+{
+  return Pitch;
+}
+
+float Camera::GetCameraZoom() const
+{
+  return Zoom;
+}
+
 void Camera::ProcessCameraMove(Camera_Movement direction, float deltaTime)
 {
   float velocity = MovementSpeed * deltaTime;
