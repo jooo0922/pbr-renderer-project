@@ -14,6 +14,9 @@
 #include <shader/shader.hpp>
 #include <light/light.hpp>
 
+// 광원 개수를 컴파일 타임 상수로 전역 변수 선언
+constexpr unsigned int NUM_LIGHTS = 4;
+
 struct LightData
 {
   glm::vec3 position;
@@ -22,7 +25,7 @@ struct LightData
 
 struct LightParameter
 {
-  std::array<LightData, LightFeature::numLights> lightDataArray;
+  std::array<LightData, NUM_LIGHTS> lightDataArray;
 };
 
 /**
@@ -33,8 +36,6 @@ struct LightParameter
 class LightFeature : public IFeature, public IListener<LightParameter>
 {
 public:
-  static constexpr unsigned int numLights = 4;
-
   LightFeature();
 
   void initialize() override;
@@ -48,7 +49,7 @@ public:
   void getLightParameter(LightParameter &param) const;
 
 private:
-  std::array<Light, numLights> lights;
+  std::array<Light, NUM_LIGHTS> lights;
 
   std::shared_ptr<Shader> pbrShaderPtr;
 
