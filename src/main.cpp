@@ -95,24 +95,6 @@ int main()
   // HDR 이미지 데이터가 렌더링된 큐브맵 텍스쳐를 바인딩할 0번 texture unit 위치값 전송
   backgroundShader->setInt("environmentMap", 0);
 
-  /* 광원 데이터 초기화 */
-  // TODO : Light 클래스 추상화 -> Light 관련 Feature 클래스 구현 시 추상화할 것.
-  // 광원 위치값이 담긴 정적 배열 초기화
-  glm::vec3 lightPositions[] = {
-      glm::vec3(-10.0f, 10.0f, 10.0f),
-      glm::vec3(10.0f, 10.0f, 10.0f),
-      glm::vec3(-10.0f, -10.0f, 10.0f),
-      glm::vec3(10.0f, -10.0f, 10.0f),
-  };
-
-  // 광원 색상값이 담긴 정적 배열 초기화
-  glm::vec3 lightColors[] = {
-      glm::vec3(300.0f, 300.0f, 300.0f),
-      glm::vec3(300.0f, 300.0f, 300.0f),
-      glm::vec3(300.0f, 300.0f, 300.0f),
-      glm::vec3(300.0f, 300.0f, 300.0f),
-  };
-
   /** renderable objects 초기화 */
 
   // Sphere 객체 생성
@@ -417,22 +399,6 @@ int main()
 
     // 구체 렌더링
     sphere.draw(*pbrShader);
-
-    /* 광원 정보 쉐이더 전송 및 광원 위치 시각화를 위한 구체 렌더링 */
-
-    // 광원 데이터 개수만큼 for-loop 순회
-    for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
-    {
-      // 시간에 따라 각 광원을 x 축 방향으로 [-5, 5] 범위 내에서 이동시키기 위한 위치값 재계산
-      glm::vec3 newPos = lightPositions[i] + glm::vec3(std::sin(glfwImpl.getTime() * 5.0) * 5.0, 0.0, 0.0);
-
-      // 광원 위치를 이동시키고 싶다면 아래의 기존 위치 재할당 코드 주석 처리
-      newPos = lightPositions[i];
-
-      // 광원 위치 및 색상 데이터를 쉐이더 프로그램에 전송
-      pbrShader->setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-      pbrShader->setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
-    }
 
     /* skybox 렌더링 */
 
