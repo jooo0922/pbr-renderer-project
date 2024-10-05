@@ -11,7 +11,7 @@ void LightFeature::initialize()
 
   // 광원 위치값이 담긴 정적 배열 초기화
   glm::vec3 lightPositions[] = {
-      glm::vec3(-10.0f, 10.0f, 10.0f),
+      glm::vec3(-2.0f, 10.0f, 10.0f),
       glm::vec3(10.0f, 10.0f, 10.0f),
       glm::vec3(-10.0f, -10.0f, 10.0f),
       glm::vec3(10.0f, -10.0f, 10.0f),
@@ -25,7 +25,7 @@ void LightFeature::initialize()
       glm::vec3(300.0f, 300.0f, 300.0f),
   };
 
-  for (unsigned int i = 0; i < numLights; i++)
+  for (unsigned int i = 0; i < lightParameter.lightDataArray.size(); i++)
   {
     lightParameter.lightDataArray[i].position = lightPositions[i];
     lightParameter.lightDataArray[i].color = lightColors[i];
@@ -40,7 +40,7 @@ void LightFeature::process()
   pbrShaderPtr->use();
 
   // 광원 데이터 개수만큼 for-loop 순회
-  for (unsigned int i = 0; i < numLights; ++i)
+  for (unsigned int i = 0; i < lights.size(); ++i)
   {
     // 광원 위치 및 색상 데이터를 쉐이더 프로그램에 전송
     pbrShaderPtr->setVec3("lightPositions[" + std::to_string(i) + "]", lights[i].getPosition());
