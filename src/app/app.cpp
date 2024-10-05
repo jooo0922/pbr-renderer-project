@@ -9,6 +9,7 @@ App::~App()
   /* 각 Feature 클래스들 종료 */
   materialFeature.finalize();
   cameraFeature.finalize();
+  lightFeature.finalize();
 }
 
 void App::initialize()
@@ -23,6 +24,7 @@ void App::process()
   /* 각 Feature 클래스들의 렌더링 루프 작업 수행 */
   materialFeature.process();
   cameraFeature.process();
+  lightFeature.process();
 }
 
 std::shared_ptr<Shader> App::getPbrShader() const
@@ -43,6 +45,11 @@ Controller<MaterialParameter> &App::getMaterialController()
 Controller<CameraParameter> &App::getCameraController()
 {
   return cameraController;
+}
+
+Controller<LightParameter> &App::getLightController()
+{
+  return lightController;
 }
 
 void App::initializeShaders()
@@ -68,6 +75,10 @@ void App::initializeFeatures()
   cameraFeature.setPbrShader(pbrShader);
   cameraFeature.setBackgroundShader(backgroundShader);
   cameraFeature.initialize();
+
+  // lightFeature 초기화
+  lightFeature.setPbrShader(pbrShader);
+  lightFeature.initialize();
 }
 
 void App::initializeControllers()
@@ -85,4 +96,10 @@ void App::initializeControllers()
   cameraFeature.getCameraParameter(cameraParameter);
   cameraController.addListener(cameraFeature);
   cameraController.setValue(cameraParameter);
+
+  // lightController 객채의 파라미터 값 초기화 및 리스너 등록
+  LightParameter lightParameter;
+  lightFeature.getLightParameter(lightParameter);
+  lightController.addListener(lightFeature);
+  lightController.setValue(lightParameter);
 }

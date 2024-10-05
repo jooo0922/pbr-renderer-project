@@ -11,6 +11,7 @@
 #include "common/controller.hpp"
 #include "features/material_feature.hpp"
 #include "features/camera_feature.hpp"
+#include "features/light_feature.hpp"
 
 /**
  * App 클래스
@@ -34,6 +35,7 @@ public:
   // controller getters
   Controller<MaterialParameter> &getMaterialController();
   Controller<CameraParameter> &getCameraController();
+  Controller<LightParameter> &getLightController();
 
 private:
   void initializeShaders();
@@ -47,10 +49,12 @@ private:
   // Features
   MaterialFeature materialFeature;
   CameraFeature cameraFeature;
+  LightFeature lightFeature;
 
   // Controllers
   Controller<MaterialParameter> materialController;
   Controller<CameraParameter> cameraController;
+  Controller<LightParameter> lightController;
 };
 
 #endif // APP_HPP
