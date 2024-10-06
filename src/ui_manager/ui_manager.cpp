@@ -45,6 +45,7 @@ void UiManager::initializeUiComponents(App &app)
   // 각 Controller 객체에 UiContainer 객체를 리스너로 등록
   appPtr->getMaterialController().addListener(materialUi);
   appPtr->getCameraController().addListener(cameraUi);
+  appPtr->getLightController().addListener(lightUi);
 
   /**
    * 각 Controller 객체에 초기화된 파라미터 값들을
@@ -56,6 +57,9 @@ void UiManager::initializeUiComponents(App &app)
 
   const CameraParameter cameraParameter = appPtr->getCameraController().getValue();
   appPtr->getCameraController().setValue(cameraParameter);
+
+  const LightParameter lightParameter = appPtr->getLightController().getValue();
+  appPtr->getLightController().setValue(lightParameter);
 }
 
 void UiManager::process()
@@ -79,6 +83,14 @@ void UiManager::process()
     if (cameraUi.onUiComponents())
     {
       onChangeCameraUi();
+    }
+    ImGui::End();
+
+    // LightUi 패널 생성
+    ImGui::Begin("Light");
+    if (lightUi.onUiComponents())
+    {
+      onChangeLightUi();
     }
     ImGui::End();
   }
@@ -109,8 +121,16 @@ void UiManager::onChangeMaterialUi()
 
 void UiManager::onChangeCameraUi()
 {
-  // CameraUi 컨테이너로부터 현재 ImGui 입력값을 가져와서 MaterialParameter 에 복사 후 Controller 객체에 notify 전파
+  // CameraUi 컨테이너로부터 현재 ImGui 입력값을 가져와서 CameraParameter 에 복사 후 Controller 객체에 notify 전파
   CameraParameter cameraParameter;
   cameraUi.getCameraParam(cameraParameter);
   appPtr->getCameraController().setValue(cameraParameter, &cameraUi);
+}
+
+void UiManager::onChangeLightUi()
+{
+  // LightUi 컨테이너로부터 현재 ImGui 입력값을 가져와서 LightParameter 에 복사 후 Controller 객체에 notify 전파
+  LightParameter lightParameter;
+  lightUi.getLightParam(lightParameter);
+  appPtr->getLightController().setValue(lightParameter, &lightUi);
 }
