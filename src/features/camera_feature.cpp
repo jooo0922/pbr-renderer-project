@@ -1,4 +1,5 @@
 #include "features/camera_feature.hpp"
+#include "constants/camera_constansts.hpp"
 
 CameraFeature::CameraFeature()
     : camera(Camera()),
@@ -10,11 +11,10 @@ CameraFeature::CameraFeature()
 void CameraFeature::initialize()
 {
   // CameraUi 에서 관리되는 각 ImGui 요소에 입력할 초기값 설정
-  // TODO : 추후에 초기값을 별도 파일에 constant 로 추출하여 정리할 것.
-  cameraParameter.yaw = -90.0f;
-  cameraParameter.pitch = 0.0f;
-  cameraParameter.zoom = 45.0f;
-  cameraParameter.position = glm::vec3(0.0f, 0.0f, 3.0f);
+  cameraParameter.yaw = CameraConstants::DEFAULT_YAW;
+  cameraParameter.pitch = CameraConstants::DEFAULT_PITCH;
+  cameraParameter.zoom = CameraConstants::DEFAULT_ZOOM;
+  cameraParameter.position = CameraConstants::DEFAULT_POSITION;
 }
 
 void CameraFeature::process()
