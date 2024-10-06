@@ -11,7 +11,7 @@ void LightFeature::initialize()
 
   // 광원 위치값이 담긴 정적 배열 초기화
   glm::vec3 lightPositions[] = {
-      glm::vec3(-2.0f, 10.0f, 10.0f),
+      glm::vec3(-10.0f, 10.0f, 10.0f),
       glm::vec3(10.0f, 10.0f, 10.0f),
       glm::vec3(-10.0f, -10.0f, 10.0f),
       glm::vec3(10.0f, -10.0f, 10.0f),
