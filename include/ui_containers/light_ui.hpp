@@ -7,6 +7,7 @@
 */
 
 #include "features/light_feature.hpp"
+#include "ui_components/drag_float.hpp"
 #include "ui_components/drag_float3.hpp"
 #include "ui_components/color_edit.hpp"
 #include "ui_components/combo.hpp"
@@ -15,6 +16,7 @@ struct LightUiSet
 {
   DragFloat3 position;
   ColorEdit color;
+  DragFloat intensity;
 };
 
 /**

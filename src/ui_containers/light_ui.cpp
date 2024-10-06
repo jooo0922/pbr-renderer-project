@@ -14,6 +14,11 @@ LightUi::LightUi()
 
     uiList[i].color.setLabel("color");
     uiList[i].color.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+
+    uiList[i].intensity.setLabel("intensity");
+    uiList[i].intensity.setMin(0.f);
+    uiList[i].intensity.setMax(1000.f);
+    uiList[i].intensity.setSpeed(0.1f);
   }
 }
 
@@ -31,6 +36,7 @@ bool LightUi::onUiComponents()
 
   ret |= uiList[currentIndex].position.onUiComponent();
   ret |= uiList[currentIndex].color.onUiComponent();
+  ret |= uiList[currentIndex].intensity.onUiComponent();
 
   return ret;
 }
@@ -42,6 +48,7 @@ void LightUi::onChange(const LightParameter &param)
   {
     uiList[lightIndex].position.setValue(lightData.position);
     uiList[lightIndex].color.setColor(lightData.color);
+    uiList[lightIndex].intensity.setValue(lightData.intensity);
 
     lightIndex += 1;
   }
@@ -53,5 +60,6 @@ void LightUi::getLightParam(LightParameter &param) const
   {
     param.lightDataArray[lightIndex].position = uiList[lightIndex].position.getValue();
     param.lightDataArray[lightIndex].color = uiList[lightIndex].color.getColor();
+    param.lightDataArray[lightIndex].intensity = uiList[lightIndex].intensity.getValue();
   }
 }
