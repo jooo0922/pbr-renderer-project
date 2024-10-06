@@ -19,6 +19,7 @@ struct LightData
 {
   glm::vec3 position;
   glm::vec3 color;
+  float intensity;
 };
 
 struct LightParameter
@@ -56,6 +57,7 @@ private:
   // 파라미터 Setter 멤버 함수
   void setPosition(Light &light, const glm::vec3 &position);
   void setColor(Light &light, const glm::vec3 &color);
+  void setIntensity(Light &light, const float &intensity);
 };
 
 #endif // DIRECT_LIGHT_FEATURE_HPP

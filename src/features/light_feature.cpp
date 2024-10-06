@@ -17,18 +17,11 @@ void LightFeature::initialize()
       glm::vec3(10.0f, -10.0f, 10.0f),
   };
 
-  // 광원 색상값이 담긴 정적 배열 초기화
-  glm::vec3 lightColors[] = {
-      glm::vec3(1.0f, 1.0f, 1.0f),
-      glm::vec3(1.0f, 1.0f, 1.0f),
-      glm::vec3(1.0f, 1.0f, 1.0f),
-      glm::vec3(1.0f, 1.0f, 1.0f),
-  };
-
   for (unsigned int i = 0; i < lightParameter.lightDataArray.size(); i++)
   {
     lightParameter.lightDataArray[i].position = lightPositions[i];
-    lightParameter.lightDataArray[i].color = lightColors[i];
+    lightParameter.lightDataArray[i].color = LightConstants::DEFAULT_COLOR;
+    lightParameter.lightDataArray[i].intensity = LightConstants::DEFAULT_INTENSITY;
   }
 }
 
@@ -44,7 +37,7 @@ void LightFeature::process()
   {
     // 광원 위치 및 색상 데이터를 쉐이더 프로그램에 전송
     pbrShaderPtr->setVec3("lightPositions[" + std::to_string(i) + "]", lights[i].getPosition());
-    pbrShaderPtr->setVec3("lightColors[" + std::to_string(i) + "]", lights[i].getColor() * 300.f);
+    pbrShaderPtr->setVec3("lightColors[" + std::to_string(i) + "]", lights[i].getColor() * lights[i].getIntensity());
   }
 }
 
@@ -68,6 +61,11 @@ void LightFeature::onChange(const LightParameter &param)
     if (light.getColor() != lightData.color)
     {
       setColor(light, lightData.color);
+    }
+
+    if (light.getIntensity() != lightData.intensity)
+    {
+      setIntensity(light, lightData.intensity);
     }
 
     lightIndex += 1;
@@ -94,4 +92,9 @@ void LightFeature::setPosition(Light &light, const glm::vec3 &position)
 void LightFeature::setColor(Light &light, const glm::vec3 &color)
 {
   light.setColor(color);
+}
+
+void LightFeature::setIntensity(Light &light, const float &intensity)
+{
+  light.setIntensity(intensity);
 }
