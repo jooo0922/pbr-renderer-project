@@ -3,7 +3,7 @@
 LightUi::LightUi()
 {
   lightSelector.setLabel("select light");
-  lightSelector.setItems({"light 1", "light 2", "light 3", "light 4"}); // TODO : 만약 빌드 에러 나면 std::vector 로 초기화해서 넘기기
+  lightSelector.setItems({"light 1", "light 2", "light 3", "light 4"});
 
   for (unsigned int i = 0; i < uiList.size(); i++)
   {
