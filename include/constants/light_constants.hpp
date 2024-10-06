@@ -1,6 +1,13 @@
 #ifndef LIGHT_CONSTANTS_HPP
 #define LIGHT_CONSTANTS_HPP
 
+/*
+  #ifndef ~ #endif 전처리기는
+  헤더파일의 헤더가드를 처리하여 중복 include 방지해 줌!
+*/
+
+#include <glm/glm.hpp>
+
 /**
  * Light 관련 심볼릭 상수 정의
  *
@@ -15,6 +22,8 @@
 namespace LightConstants
 {
   constexpr unsigned int NUM_LIGHTS = 4;
+  constexpr float DEFAULT_INTENSITY = 300.f;
+  constexpr glm::vec3 DEFAULT_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
 #endif // LIGHT_CONSTANTS_HPP
