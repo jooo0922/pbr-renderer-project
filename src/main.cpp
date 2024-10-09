@@ -246,6 +246,7 @@ int main()
     Cubemap 텍스쳐 객체 생성
   */
   CubeTexture prefilterMap(128, 128, GL_RGB16F, GL_RGB);
+  prefilterMap.setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
   prefilterMap.generateMipmap();
 
   /* prefilterShader 에 텍스쳐 및 행렬 전달 */
