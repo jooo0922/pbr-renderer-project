@@ -21,6 +21,8 @@
 class CubeTexture : public IGLObject
 {
 public:
+  CubeTexture() = default;
+
   // 비어있는 텍스쳐 버퍼 객체 생성 -> offscreen rendering 결과를 저장할 용도
   CubeTexture(GLsizei width, GLsizei height, GLenum format, GLenum internalFormat);
 

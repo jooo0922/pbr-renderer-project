@@ -17,6 +17,8 @@
 class Texture : public IGLObject
 {
 public:
+  Texture() = default;
+
   // 이미지 url 을 로드하여 텍스쳐 객체 생성
   Texture(const char *url, GLenum format, GLenum internalFormat);
 
