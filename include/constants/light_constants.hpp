@@ -21,7 +21,7 @@
  */
 namespace LightConstants
 {
-  constexpr unsigned int NUM_LIGHTS = 4;
+  constexpr std::size_t NUM_LIGHTS = 4;
   constexpr float DEFAULT_INTENSITY = 300.f;
   constexpr glm::vec3 DEFAULT_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
 }
