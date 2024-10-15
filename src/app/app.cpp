@@ -26,14 +26,24 @@ void App::process()
   materialFeature.process();
   cameraFeature.process();
   lightFeature.process();
-
   offscreenRenderingFeature.process();
 
+  // TODO : IBLFeature 구현 후, offscreen buffer 바인딩 코드 이동 (Combo ui 입력값 변경에 따른 index 매개변수 전달 추가)
   offscreenRenderingFeature.useIrradianceMap(0);
   offscreenRenderingFeature.usePrefilterMap(0);
   offscreenRenderingFeature.useBRDFLUTTexture();
 
-  offscreenRenderingFeature.renderSkybox(0);
+  /** skybox 렌더링 */
+  // TODO : IBLFeature 구현 후 skybox 렌더링 코드 이동
+
+  // skybox 쉐이더 프로그램 바인딩
+  backgroundShader->use();
+
+  // HDR 큐브맵 텍스쳐를 바인딩하여 skybox 텍스쳐로 사용
+  offscreenRenderingFeature.useEnvCubemap(0);
+
+  // skybox 렌더링
+  offscreenRenderingFeature.getCube().draw(*backgroundShader);
 }
 
 std::shared_ptr<Shader> App::getPbrShader() const
