@@ -12,6 +12,7 @@
 #include "features/material_feature.hpp"
 #include "features/camera_feature.hpp"
 #include "features/light_feature.hpp"
+#include "features/offscreen_rendering_feature.hpp"
 
 /**
  * App 클래스
@@ -50,6 +51,7 @@ private:
   MaterialFeature materialFeature;
   CameraFeature cameraFeature;
   LightFeature lightFeature;
+  OffscreenRenderingFeature offscreenRenderingFeature;
 
   // Controllers
   Controller<MaterialParameter> materialController;

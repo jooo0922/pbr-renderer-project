@@ -10,6 +10,7 @@ App::~App()
   materialFeature.finalize();
   cameraFeature.finalize();
   lightFeature.finalize();
+  offscreenRenderingFeature.finalize();
 }
 
 void App::initialize()
@@ -25,6 +26,14 @@ void App::process()
   materialFeature.process();
   cameraFeature.process();
   lightFeature.process();
+
+  offscreenRenderingFeature.process();
+
+  offscreenRenderingFeature.useIrradianceMap(0);
+  offscreenRenderingFeature.usePrefilterMap(0);
+  offscreenRenderingFeature.useBRDFLUTTexture();
+
+  offscreenRenderingFeature.renderSkybox(0);
 }
 
 std::shared_ptr<Shader> App::getPbrShader() const
@@ -79,6 +88,11 @@ void App::initializeFeatures()
   // lightFeature 초기화
   lightFeature.setPbrShader(pbrShader);
   lightFeature.initialize();
+
+  // offscreenRenderingFeature 초기화
+  offscreenRenderingFeature.setPbrShader(pbrShader);
+  offscreenRenderingFeature.setBackgroundShader(backgroundShader);
+  offscreenRenderingFeature.initialize();
 }
 
 void App::initializeControllers()
