@@ -43,17 +43,9 @@ public:
   void useBRDFLUTTexture();
 
   // OffscreenRenderingFeature 가 의존성을 갖는 primitive 객체를 렌더링하는 함수
-  void renderSkybox();
-  void renderBRDFIntegrationMap(); // BRDF Integration map 이 제대로 생성되었는지 디버깅할 목적으로 실행
+  void renderSkybox(std::size_t envCubemapIndex);
 
 private:
-  // offscreen rendering 시 바인딩할 쉐이더 객체들
-  // -> 각 generate~() 함수에서 일시 정적 할당해서 사용하고 말아도 될 Shader 객체들을 불필요하게 멤버로 관리 -> 메모리 낭비!
-  // Shader equirectangularToCubemapShader;
-  // Shader irradianceShader;
-  // Shader prefilterShader;
-  // Shader brdfShader;
-
   // offscreen rendering 결과가 저장된 텍스쳐들의 texture unit 위치값을 전송할 쉐이더 객체들
   std::shared_ptr<Shader> pbrShaderPtr;
   std::shared_ptr<Shader> backgroundShaderPtr;
@@ -70,11 +62,11 @@ private:
   std::array<const char *, OffscreenRenderingConstants::NUM_HDR_IMAGES> hdrImages;
 
   // offscreen rendering 결과를 저장할 텍스쳐 버퍼들
-  std::array<Texture, OffscreenRenderingConstants::NUM_HDR_IMAGES> hdrTextures;
-  std::array<CubeTexture, OffscreenRenderingConstants::NUM_HDR_IMAGES> envCubemaps;
-  std::array<CubeTexture, OffscreenRenderingConstants::NUM_HDR_IMAGES> irradianceMaps;
-  std::array<CubeTexture, OffscreenRenderingConstants::NUM_HDR_IMAGES> prefilterMaps;
-  Texture brdfLUTTexture;
+  std::array<std::unique_ptr<Texture>, OffscreenRenderingConstants::NUM_HDR_IMAGES> hdrTextures;
+  std::array<std::unique_ptr<CubeTexture>, OffscreenRenderingConstants::NUM_HDR_IMAGES> envCubemaps;
+  std::array<std::unique_ptr<CubeTexture>, OffscreenRenderingConstants::NUM_HDR_IMAGES> irradianceMaps;
+  std::array<std::unique_ptr<CubeTexture>, OffscreenRenderingConstants::NUM_HDR_IMAGES> prefilterMaps;
+  std::unique_ptr<Texture> brdfLUTTexture;
 
   // CubeTexture 버퍼에 offscreen rendering 시 단위 큐브 객체에 적용할 변환 행렬들
   glm::mat4 captureProjection;
