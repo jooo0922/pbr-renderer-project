@@ -42,8 +42,9 @@ public:
   void usePrefilterMap(const size_t index);
   void useBRDFLUTTexture();
 
-  // OffscreenRenderingFeature 가 의존성을 갖는 primitive 객체를 렌더링하는 함수
-  void renderSkybox(const size_t envCubemapIndex);
+  // 각 primitive getter 함수들
+  Cube &getCube();
+  Quad &getQuad();
 
 private:
   // offscreen rendering 결과가 저장된 텍스쳐들의 texture unit 위치값을 전송할 쉐이더 객체들

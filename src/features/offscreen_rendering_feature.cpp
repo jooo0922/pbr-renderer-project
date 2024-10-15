@@ -168,18 +168,14 @@ void OffscreenRenderingFeature::useBRDFLUTTexture()
   brdfLUTTexture->use(GL_TEXTURE2);
 }
 
-void OffscreenRenderingFeature::renderSkybox(const size_t envCubemapIndex)
+Cube &OffscreenRenderingFeature::getCube()
 {
-  /* skybox 렌더링 */
+  return cube;
+}
 
-  // skybox 쉐이더 프로그램 바인딩
-  backgroundShaderPtr->use();
-
-  // HDR 큐브맵 텍스쳐를 바인딩하여 skybox 텍스쳐로 사용
-  useEnvCubemap(envCubemapIndex);
-
-  // skybox 렌더링
-  cube.draw(*backgroundShaderPtr);
+Quad &OffscreenRenderingFeature::getQuad()
+{
+  return quad;
 }
 
 void OffscreenRenderingFeature::generateEnvCubemap()
