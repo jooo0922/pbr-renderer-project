@@ -23,9 +23,44 @@
 namespace OffscreenRenderingConstants
 {
   constexpr std::size_t NUM_CUBE_MAP_FACES = 6;
-  constexpr std::size_t NUM_HDR_IMAGES = 1;
+  constexpr std::size_t NUM_HDR_IMAGES = 2;
   constexpr std::array<const char *, NUM_HDR_IMAGES> HDR_IMAGES = {
-      "resources/textures/hdr/newport_loft.hdr"};
+      "resources/textures/hdr/newport_loft.hdr",
+      "resources/textures/hdr/buikslotermeerplein.hdr",
+  };
+
+  // pbrShader 관련 texture unit 상수 정의
+  namespace PBRShader
+  {
+    constexpr int IRRADIANCE_MAP_UNIT = 0;
+    constexpr int PREFILTER_MAP_UNIT = 1;
+    constexpr int BRDF_LUT_UNIT = 2;
+  };
+
+  // backgroundShader 관련 texture unit 상수 정의
+  namespace BackgroundShader
+  {
+    constexpr int ENVIRONMENT_MAP_UNIT = 3;
+  };
+
+  // equirectangularToCubemapShader 관련 texture unit 상수 정의
+  namespace EquirectangularToCubemapShader
+  {
+    constexpr int HDR_TEXTURE_UNIT = 0;
+  };
+
+  // irradianceShader 관련 texture unit 상수 정의
+  namespace IrradianceShader
+  {
+    constexpr int ENVIRONMENT_MAP_UNIT = 0;
+  };
+
+  // prefilterShader 관련 texture unit 상수 정의
+  namespace PrefilterShader
+  {
+    constexpr int ENVIRONMENT_MAP_UNIT = 0;
+  };
+
 };
 
 #endif // OFFSCREEN_RENDERING_CONSTANTS_HPP
