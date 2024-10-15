@@ -37,13 +37,13 @@ public:
   void setBackgroundShader(std::shared_ptr<Shader> backgroundShader);
 
   // 각 텍스쳐 버퍼의 index 를 매개변수로 전달받아 사용할 offscreen rendering 버퍼를 바인딩하는 함수
-  void useEnvCubemap(std::size_t index);
-  void useIrradianceMap(std::size_t index);
-  void usePrefilterMap(std::size_t index);
+  void useEnvCubemap(const size_t index);
+  void useIrradianceMap(const size_t index);
+  void usePrefilterMap(const size_t index);
   void useBRDFLUTTexture();
 
   // OffscreenRenderingFeature 가 의존성을 갖는 primitive 객체를 렌더링하는 함수
-  void renderSkybox(std::size_t envCubemapIndex);
+  void renderSkybox(const size_t envCubemapIndex);
 
 private:
   // offscreen rendering 결과가 저장된 텍스쳐들의 texture unit 위치값을 전송할 쉐이더 객체들

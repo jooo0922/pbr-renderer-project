@@ -126,7 +126,7 @@ void OffscreenRenderingFeature::setBackgroundShader(std::shared_ptr<Shader> back
   backgroundShaderPtr = backgroundShader;
 }
 
-void OffscreenRenderingFeature::useEnvCubemap(std::size_t index)
+void OffscreenRenderingFeature::useEnvCubemap(const size_t index)
 {
   // envCubemaps 컨테이너에 유효한 인덱스가 아닌 경우 예외 처리
   if (index >= envCubemaps.size())
@@ -138,7 +138,7 @@ void OffscreenRenderingFeature::useEnvCubemap(std::size_t index)
   envCubemaps[index]->use(GL_TEXTURE3);
 }
 
-void OffscreenRenderingFeature::useIrradianceMap(std::size_t index)
+void OffscreenRenderingFeature::useIrradianceMap(const size_t index)
 {
   // irradianceMaps 컨테이너에 유효한 인덱스가 아닌 경우 예외 처리
   if (index >= irradianceMaps.size())
@@ -150,7 +150,7 @@ void OffscreenRenderingFeature::useIrradianceMap(std::size_t index)
   irradianceMaps[index]->use(GL_TEXTURE0);
 }
 
-void OffscreenRenderingFeature::usePrefilterMap(std::size_t index)
+void OffscreenRenderingFeature::usePrefilterMap(const size_t index)
 {
   // irradianceMaps 컨테이너에 유효한 인덱스가 아닌 경우 예외 처리
   if (index >= prefilterMaps.size())
@@ -168,7 +168,7 @@ void OffscreenRenderingFeature::useBRDFLUTTexture()
   brdfLUTTexture->use(GL_TEXTURE2);
 }
 
-void OffscreenRenderingFeature::renderSkybox(std::size_t envCubemapIndex)
+void OffscreenRenderingFeature::renderSkybox(const size_t envCubemapIndex)
 {
   /* skybox 렌더링 */
 
