@@ -82,13 +82,13 @@ void OffscreenRenderingFeature::initialize()
   pbrShaderPtr->use();
 
   // irradiance map 큐브맵 텍스쳐를 바인딩할 0번 texture unit 위치값 전송
-  pbrShaderPtr->setInt("irradianceMap", 0);
+  pbrShaderPtr->setInt("irradianceMap", OffscreenRenderingConstants::PBRShader::IRRADIANCE_MAP_UNIT);
 
   // pre-filtered env map 큐브맵 텍스쳐를 바인딩할 1번 texture unit 위치값 전송
-  pbrShaderPtr->setInt("prefilterMap", 1);
+  pbrShaderPtr->setInt("prefilterMap", OffscreenRenderingConstants::PBRShader::PREFILTER_MAP_UNIT);
 
   // BRDF Integration map 텍스쳐를 바인딩할 2번 texture unit 위치값 전송
-  pbrShaderPtr->setInt("brdfLUT", 2);
+  pbrShaderPtr->setInt("brdfLUT", OffscreenRenderingConstants::PBRShader::BRDF_LUT_UNIT);
 
   /* skybox 에 적용할 uniform 변수들을 쉐이더 프로그램에 전송 */
 
@@ -97,7 +97,7 @@ void OffscreenRenderingFeature::initialize()
 
   // HDR 이미지 데이터가 렌더링된 큐브맵 텍스쳐를 바인딩할 3번 texture unit 위치값 전송
   // -> irradiance map 이랑 texture unit 위치값이 겹쳐서 의도치 않은 텍스쳐 바인딩 버그 발생 방지 목적
-  backgroundShaderPtr->setInt("environmentMap", 3);
+  backgroundShaderPtr->setInt("environmentMap", OffscreenRenderingConstants::BackgroundShader::ENVIRONMENT_MAP_UNIT);
 
   /** 각 텍스쳐 버퍼에 offscreen rendering 하는 함수들 실행 */
   generateEnvCubemap();
@@ -134,8 +134,8 @@ void OffscreenRenderingFeature::useEnvCubemap(const size_t index)
     throw std::out_of_range("Error: useEnvCubemap - The provided index " + std::to_string(index) + " is out of range. Maximum allowed index is " + std::to_string(envCubemaps.size() - 1) + ".");
   }
 
-  // HDR 큐브맵 텍스쳐를 0번 texture unit 에 바인딩하여 사용
-  envCubemaps[index]->use(GL_TEXTURE3);
+  // HDR 큐브맵 텍스쳐를 3번 texture unit 에 바인딩하여 사용
+  envCubemaps[index]->use(GL_TEXTURE0 + OffscreenRenderingConstants::BackgroundShader::ENVIRONMENT_MAP_UNIT);
 }
 
 void OffscreenRenderingFeature::useIrradianceMap(const size_t index)
@@ -147,7 +147,7 @@ void OffscreenRenderingFeature::useIrradianceMap(const size_t index)
   }
 
   // 미리 계산된 irradiance 가 저장되어 있는 irradianceMap 을 바인딩
-  irradianceMaps[index]->use(GL_TEXTURE0);
+  irradianceMaps[index]->use(GL_TEXTURE0 + OffscreenRenderingConstants::PBRShader::IRRADIANCE_MAP_UNIT);
 }
 
 void OffscreenRenderingFeature::usePrefilterMap(const size_t index)
@@ -159,13 +159,13 @@ void OffscreenRenderingFeature::usePrefilterMap(const size_t index)
   }
 
   // 미리 계산된 split-sum approximation 의 첫 번째 적분식 결과값이 저장되어 있는 pre-filtered env map 을 바인딩
-  prefilterMaps[index]->use(GL_TEXTURE1);
+  prefilterMaps[index]->use(GL_TEXTURE0 + OffscreenRenderingConstants::PBRShader::PREFILTER_MAP_UNIT);
 }
 
 void OffscreenRenderingFeature::useBRDFLUTTexture()
 {
   // 미리 계산된 split-sum approximation 의 두 번째 적분식 결과값이 저장되어 있는 BRDF Integration map 을 바인딩
-  brdfLUTTexture->use(GL_TEXTURE2);
+  brdfLUTTexture->use(GL_TEXTURE0 + OffscreenRenderingConstants::PBRShader::BRDF_LUT_UNIT);
 }
 
 Cube &OffscreenRenderingFeature::getCube()
@@ -204,7 +204,7 @@ void OffscreenRenderingFeature::generateEnvCubemap()
   equirectangularToCubemapShader.use();
 
   // HDR 이미지 텍스쳐를 바인딩할 0번 texture unit 위치값 전송
-  equirectangularToCubemapShader.setInt("equirectangularMap", 0);
+  equirectangularToCubemapShader.setInt("equirectangularMap", OffscreenRenderingConstants::EquirectangularToCubemapShader::HDR_TEXTURE_UNIT);
 
   // fov(시야각)이 90로 고정된 투영행렬 전송
   equirectangularToCubemapShader.setMat4("projection", captureProjection);
@@ -219,7 +219,7 @@ void OffscreenRenderingFeature::generateEnvCubemap()
   for (size_t textureIndex = 0; textureIndex < envCubemaps.size(); textureIndex++)
   {
     // HDR 이미지 텍스쳐를 0번 texture unit 에 바인딩해서 사용
-    hdrTextures[textureIndex]->use(GL_TEXTURE0);
+    hdrTextures[textureIndex]->use(GL_TEXTURE0 + OffscreenRenderingConstants::EquirectangularToCubemapShader::HDR_TEXTURE_UNIT);
 
     // HDR 이미지가 적용된 단위 큐브의 각 면을 바라보도록 카메라를 회전시키며 6번 렌더링
     for (size_t faceIndex = 0; faceIndex < OffscreenRenderingConstants::NUM_CUBE_MAP_FACES; faceIndex++)
@@ -268,7 +268,7 @@ void OffscreenRenderingFeature::generateIrradianceMap()
   irradianceShader.use();
 
   // HDR 큐브맵 텍스쳐를 바인딩할 0번 texture unit 위치값 전송
-  irradianceShader.setInt("environmentMap", 0);
+  irradianceShader.setInt("environmentMap", OffscreenRenderingConstants::IrradianceShader::ENVIRONMENT_MAP_UNIT);
 
   // fov(시야각)이 90로 고정된 투영행렬 전송
   irradianceShader.setMat4("projection", captureProjection);
@@ -283,7 +283,7 @@ void OffscreenRenderingFeature::generateIrradianceMap()
   for (size_t textureIndex = 0; textureIndex < irradianceMaps.size(); textureIndex++)
   {
     // HDR 큐브맵 텍스쳐를 0번 texture unit 에 바인딩하여 사용
-    envCubemaps[textureIndex]->use(GL_TEXTURE0);
+    envCubemaps[textureIndex]->use(GL_TEXTURE0 + OffscreenRenderingConstants::IrradianceShader::ENVIRONMENT_MAP_UNIT);
 
     // irradiance map 을 렌더링할 단위 큐브의 각 면을 바라보도록 카메라를 회전시키며 6번 렌더링
     for (size_t faceIndex = 0; faceIndex < OffscreenRenderingConstants::NUM_CUBE_MAP_FACES; faceIndex++)
@@ -323,7 +323,7 @@ void OffscreenRenderingFeature::generatePrefilterMap()
   prefilterShader.use();
 
   // HDR 큐브맵 텍스쳐를 바인딩할 0번 texture unit 위치값 전송
-  prefilterShader.setInt("environmentMap", 0);
+  prefilterShader.setInt("environmentMap", OffscreenRenderingConstants::PrefilterShader::ENVIRONMENT_MAP_UNIT);
 
   // fov(시야각)이 90로 고정된 투영행렬 전송
   prefilterShader.setMat4("projection", captureProjection);
@@ -335,7 +335,7 @@ void OffscreenRenderingFeature::generatePrefilterMap()
   for (size_t textureIndex = 0; textureIndex < prefilterMaps.size(); textureIndex++)
   {
     // HDR 큐브맵 텍스쳐를 0번 texture unit 에 바인딩하여 사용
-    envCubemaps[textureIndex]->use(GL_TEXTURE0);
+    envCubemaps[textureIndex]->use(GL_TEXTURE0 + OffscreenRenderingConstants::PrefilterShader::ENVIRONMENT_MAP_UNIT);
 
     // 최대 mip level 변수 초기화
     unsigned int maxMipLevels = 5;
