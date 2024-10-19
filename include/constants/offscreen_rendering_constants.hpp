@@ -24,10 +24,17 @@ namespace OffscreenRenderingConstants
 {
   constexpr std::size_t NUM_CUBE_MAP_FACES = 6;
   constexpr std::size_t NUM_HDR_IMAGES = 2;
-  constexpr std::array<const char *, NUM_HDR_IMAGES> HDR_IMAGES = {
-      "resources/textures/hdr/newport_loft.hdr",
-      "resources/textures/hdr/buikslotermeerplein.hdr",
+
+  struct HDRImage
+  {
+    const char *label;
+    const char *path;
   };
+
+  constexpr std::array<HDRImage, NUM_HDR_IMAGES> HDR_IMAGES = {{
+      {"Newport Loft", "resources/textures/hdr/newport_loft.hdr"},
+      {"Buikslotermeerplein", "resources/textures/hdr/buikslotermeerplein.hdr"},
+  }};
 
   // pbrShader 관련 texture unit 상수 정의
   namespace PBRShader
