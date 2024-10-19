@@ -54,7 +54,7 @@ void IBLFeature::finalize()
 
 void IBLFeature::onChange(const IBLParameter &param)
 {
-  if (iblVisibility != param.iblIntensity)
+  if (iblVisibility != param.iblVisibility)
   {
     setIBLVisibility(param.iblVisibility);
   }
