@@ -46,6 +46,7 @@ void UiManager::initializeUiComponents(App &app)
   appPtr->getMaterialController().addListener(materialUi);
   appPtr->getCameraController().addListener(cameraUi);
   appPtr->getLightController().addListener(lightUi);
+  appPtr->getIBLController().addListener(iblUi);
 
   /**
    * 각 Controller 객체에 초기화된 파라미터 값들을
@@ -60,6 +61,9 @@ void UiManager::initializeUiComponents(App &app)
 
   const LightParameter lightParameter = appPtr->getLightController().getValue();
   appPtr->getLightController().setValue(lightParameter);
+
+  const IBLParameter iblParameter = appPtr->getIBLController().getValue();
+  appPtr->getIBLController().setValue(iblParameter);
 }
 
 void UiManager::process()
@@ -91,6 +95,14 @@ void UiManager::process()
     if (lightUi.onUiComponents())
     {
       onChangeLightUi();
+    }
+    ImGui::End();
+
+    // IBLUi 패널 생성
+    ImGui::Begin("IBL");
+    if (iblUi.onUiComponents())
+    {
+      onChangeIBLUi();
     }
     ImGui::End();
   }
@@ -133,4 +145,12 @@ void UiManager::onChangeLightUi()
   LightParameter lightParameter;
   lightUi.getLightParam(lightParameter);
   appPtr->getLightController().setValue(lightParameter, &lightUi);
+}
+
+void UiManager::onChangeIBLUi()
+{
+  // IBLUi 컨테이너로부터 현재 ImGui 입력값을 가져와서 IBLParameter 에 복사 후 Controller 객체에 notify 전파
+  IBLParameter iblParameter;
+  iblUi.getIBLParam(iblParameter);
+  appPtr->getIBLController().setValue(iblParameter, &iblUi);
 }
