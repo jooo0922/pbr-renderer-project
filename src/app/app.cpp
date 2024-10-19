@@ -11,6 +11,7 @@ App::~App()
   cameraFeature.finalize();
   lightFeature.finalize();
   offscreenRenderingFeature.finalize();
+  iblFeature.finalize();
 }
 
 void App::initialize()
@@ -27,23 +28,7 @@ void App::process()
   cameraFeature.process();
   lightFeature.process();
   offscreenRenderingFeature.process();
-
-  // TODO : IBLFeature 구현 후, offscreen buffer 바인딩 코드 이동 (Combo ui 입력값 변경에 따른 index 매개변수 전달 추가)
-  offscreenRenderingFeature.useIrradianceMap(1);
-  offscreenRenderingFeature.usePrefilterMap(1);
-  offscreenRenderingFeature.useBRDFLUTTexture();
-
-  /** skybox 렌더링 */
-  // TODO : IBLFeature 구현 후 skybox 렌더링 코드 이동
-
-  // skybox 쉐이더 프로그램 바인딩
-  backgroundShader->use();
-
-  // HDR 큐브맵 텍스쳐를 바인딩하여 skybox 텍스쳐로 사용
-  offscreenRenderingFeature.useEnvCubemap(1);
-
-  // skybox 렌더링
-  offscreenRenderingFeature.getCube().draw(*backgroundShader);
+  iblFeature.process();
 }
 
 std::shared_ptr<Shader> App::getPbrShader() const
@@ -69,6 +54,11 @@ Controller<CameraParameter> &App::getCameraController()
 Controller<LightParameter> &App::getLightController()
 {
   return lightController;
+}
+
+Controller<IBLParameter> &App::getIBLController()
+{
+  return iblController;
 }
 
 void App::initializeShaders()
@@ -103,6 +93,12 @@ void App::initializeFeatures()
   offscreenRenderingFeature.setPbrShader(pbrShader);
   offscreenRenderingFeature.setBackgroundShader(backgroundShader);
   offscreenRenderingFeature.initialize();
+
+  // iblFeature 초기화
+  iblFeature.setPbrShader(pbrShader);
+  iblFeature.setBackgroundShader(backgroundShader);
+  iblFeature.setOffscreenRenderingFeature(&offscreenRenderingFeature);
+  iblFeature.initialize();
 }
 
 void App::initializeControllers()
@@ -126,4 +122,10 @@ void App::initializeControllers()
   lightFeature.getLightParameter(lightParameter);
   lightController.addListener(lightFeature);
   lightController.setValue(lightParameter);
+
+  // iblController 객체의 파라미터 값 초기화 및 리스너 등록
+  IBLParameter iblParameter;
+  iblFeature.getIBLParameter(iblParameter);
+  iblController.addListener(iblFeature);
+  iblController.setValue(iblParameter);
 }
