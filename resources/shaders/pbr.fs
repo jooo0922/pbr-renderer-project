@@ -34,6 +34,10 @@ uniform vec3 camPos;
 // Pi 상수 선언
 const float PI = 3.14159265359;
 
+// IBL 파라미터 값을 전송받는 uniform 변수 선언
+uniform bool iblVisibility;
+uniform float iblIntensity;
+
 /* Cook-Torrance BRDF 의 Specular term 계산에 필요한 함수들 구현 */
 
 /*
@@ -341,9 +345,14 @@ void main() {
     LearnOpenGL 본문의 이중시그마 식에서 kD 에 해당하는 굴절율을 diffuse term 에 곱해주고,
     pre-filtered env map 과 BRDF Integration map 으로부터 샘플링해와서 계산한 specular term 적분식의 결과값을 더하고,
     ambient occlusion factor 를 곱해서 환경광이 차폐되는 영역까지 고려하여
-    IBL 을 사용한 최종 ambient lighting 계산 완료! 
+    IBL 을 사용한 최종 ambient lighting 계산 완료!
+
+    + iblVisibility 값에 따라 IBL 로 계산된 ambient 값을 사용할 지,
+    direct lighting 계산 시 사용했던 ambient 값을 사용할 지 결정(ambient 관련 하단 필기 참고)
+
+    + PBR Material 파라미터와 무관한 iblIntensity 를 하여 IBL 의 비중을 계산함.
   */
-  vec3 ambient = (kD * diffuse + specular) * ao;
+  vec3 ambient = iblVisibility ? (kD * diffuse + specular) * ao * iblIntensity : vec3(0.03) * albedo * ao;
 
   // 현재 surface point 지점에서 최종적으로 반사되는 조명값 계산
   vec3 color = ambient + Lo;
