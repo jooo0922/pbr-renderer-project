@@ -25,13 +25,11 @@ void IBLFeature::process()
   pbrShaderPtr->setFloat("iblIntensity", iblIntensity);
 
   // hdrImageIndex 에 따른 offscreen buffer 바인딩
-  // TODO : 함수로 추출
   offscreenRenderingFeaturePtr->useIrradianceMap(hdrImageIndex);
   offscreenRenderingFeaturePtr->usePrefilterMap(hdrImageIndex);
   offscreenRenderingFeaturePtr->useBRDFLUTTexture();
 
   /** skybox 렌더링 */
-  // TODO : 함수로 추출
   if (skyboxVisibility)
   {
     // skybox 쉐이더 프로그램 바인딩
