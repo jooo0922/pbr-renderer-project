@@ -13,11 +13,12 @@ OffscreenRenderingFeature::OffscreenRenderingFeature()
     : pbrShaderPtr(nullptr),
       backgroundShaderPtr(nullptr)
 {
-  hdrImages = OffscreenRenderingConstants::HDR_IMAGES;
-
   /** 각 offscreen rendering 텍스쳐 버퍼 객체 초기화 */
   for (size_t i = 0; i < OffscreenRenderingConstants::NUM_HDR_IMAGES; i++)
   {
+    /** HDR 이미지 경로 초기화 */
+    hdrImages[i] = OffscreenRenderingConstants::HDR_IMAGES[i].path;
+
     /** .hdr 이미지 로드하여 텍스쳐 객체 생성 */
     hdrTextures[i] = std::make_unique<Texture>(hdrImages[i], GL_RGB16F, GL_RGB);
 
