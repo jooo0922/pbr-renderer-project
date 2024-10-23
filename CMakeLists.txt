@@ -28,6 +28,20 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
+# assimp
+FetchContent_Declare(
+  assimp
+  GIT_REPOSITORY https://github.com/assimp/assimp.git
+  GIT_TAG v5.0.1
+)
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(assimp)
+
 # ImGui 정적 라이브러리 정의 (코드 수정을 안하므로 정적 라이브러리로 빌드)
 add_library(imgui STATIC
   ${CMAKE_SOURCE_DIR}/imgui/imgui.cpp
@@ -52,6 +66,7 @@ add_executable(${PROJECT_NAME} src/main.cpp)
 target_include_directories(${PROJECT_NAME} PRIVATE
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR}/3rdparty
+  ${assimp_SOURCE_DIR}/include
 )
 
 # src/... 하위의 *.cpp 파일들을 재귀적으로 검색하여 찾기
@@ -73,7 +88,7 @@ target_link_libraries(imgui PRIVATE glfw)
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
 # 타겟에 라이브러리 링크
-target_link_libraries(${PROJECT_NAME} PRIVATE glfw spdlog imgui)
+target_link_libraries(${PROJECT_NAME} PRIVATE glfw spdlog imgui assimp)
 
 # 타겟에 매크로 컴파일 정의
 target_compile_definitions(${PROJECT_NAME} PRIVATE
