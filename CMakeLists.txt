@@ -12,35 +12,10 @@ set(WINDOW_HEIGHT 720)
 # FetchContent 모듈 포함
 include(FetchContent)
 
-# spdlog
-FetchContent_Declare(
-  spdlog
-  GIT_REPOSITORY https://github.com/gabime/spdlog.git
-  GIT_TAG v1.x
-)
-FetchContent_MakeAvailable(spdlog)
-
-# glfw
-FetchContent_Declare(
-  glfw
-  GIT_REPOSITORY https://github.com/glfw/glfw.git
-  GIT_TAG 3.3.2
-)
-FetchContent_MakeAvailable(glfw)
-
-# assimp
-FetchContent_Declare(
-  assimp
-  GIT_REPOSITORY https://github.com/assimp/assimp.git
-  GIT_TAG v5.0.1
-)
-
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
-set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(assimp)
+# 외부 라이브러리 설정 파일 포함
+include(cmake/glfw.cmake)
+include(cmake/spdlog.cmake)
+include(cmake/assimp.cmake)
 
 # ImGui 정적 라이브러리 정의 (코드 수정을 안하므로 정적 라이브러리로 빌드)
 add_library(imgui STATIC
