@@ -80,4 +80,4 @@ private:
   void generateBRDFLUTTexture();
 };
 
-#endif // OFFSCREEN_RENDERING_FEATURE_HPP
+#endif/* OFFSCREEN_RENDERING_FEATURE_HPP */
