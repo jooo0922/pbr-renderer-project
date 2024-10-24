@@ -20,4 +20,4 @@ protected:
   virtual void generateVertexData(std::vector<SimpleVertexData> &vertices, std::vector<unsigned int> &indices) const = 0;
 };
 
-#endif // PRIMITIVE_HPP
+#endif /* PRIMITIVE_HPP */

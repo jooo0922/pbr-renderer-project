@@ -42,7 +42,7 @@ private:
   GLuint ID;
 };
 
-#endif // VERTEX_ARRAY_OBJECT_HPP
+#endif /* VERTEX_ARRAY_OBJECT_HPP */
 
 /*
   VAO 는 왜 만드는걸까?
