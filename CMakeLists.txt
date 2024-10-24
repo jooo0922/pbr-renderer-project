@@ -30,7 +30,7 @@ add_library(imgui STATIC
 # ImGui 정적 라이브러리에 헤더 파일 추가
 target_include_directories(imgui PUBLIC
   ${CMAKE_SOURCE_DIR}/imgui
-  ${glfw_SOURCE_DIR}/include # glfw 헤더 파일 경로 추가
+  ${glfw_INCLUDE} # glfw 헤더 파일 경로 추가
   ${CMAKE_SOURCE_DIR}/3rdparty # glad 헤더 파일 경로 추가
 )
 
@@ -41,7 +41,7 @@ add_executable(${PROJECT_NAME} src/main.cpp)
 target_include_directories(${PROJECT_NAME} PRIVATE
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR}/3rdparty
-  ${assimp_SOURCE_DIR}/include
+  ${assimp_INCLUDE}
 )
 
 # src/... 하위의 *.cpp 파일들을 재귀적으로 검색하여 찾기

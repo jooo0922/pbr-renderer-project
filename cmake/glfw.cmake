@@ -7,3 +7,6 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(glfw)
+
+# glfw 헤더 파일 경로 변수 설정
+set(glfw_INCLUDE ${glfw_SOURCE_DIR}/include)

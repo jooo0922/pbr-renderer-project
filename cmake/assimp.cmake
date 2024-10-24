@@ -18,3 +18,6 @@ FetchContent_MakeAvailable(assimp)
 
 # BUILD_SHARED_LIBS 값을 원래대로 복구
 set(BUILD_SHARED_LIBS ${BACKUP_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
+
+# assimp 헤더 파일 경로 변수 설정
+set(assimp_INCLUDE ${assimp_SOURCE_DIR}/include)
