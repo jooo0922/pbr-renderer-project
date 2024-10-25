@@ -1,26 +1,27 @@
 #include "ui_containers/camera_ui.hpp"
+#include "constants/camera_constansts.hpp"
 
 CameraUi::CameraUi()
 {
-  yaw.setLabel("yaw");
-  yaw.setMin(-180.f);
-  yaw.setMax(180.f);
-  yaw.setSpeed(0.1f);
+  yaw.setLabel(CameraConstants::YAW_UI_LABEL);
+  yaw.setMin(CameraConstants::YAW_MIN);
+  yaw.setMax(CameraConstants::YAW_MAX);
+  yaw.setSpeed(CameraConstants::YAW_UI_SPEED);
 
-  pitch.setLabel("pitch");
-  pitch.setMin(-89.f);
-  pitch.setMax(89.f);
-  pitch.setSpeed(0.1f);
+  pitch.setLabel(CameraConstants::PITCH_UI_LABEL);
+  pitch.setMin(CameraConstants::PITCH_MIN);
+  pitch.setMax(CameraConstants::PITCH_MAX);
+  pitch.setSpeed(CameraConstants::PITCH_UI_SPEED);
 
-  zoom.setLabel("zoom");
-  zoom.setMin(1.f);
-  zoom.setMax(45.f);
-  zoom.setSpeed(0.1f);
+  zoom.setLabel(CameraConstants::ZOOM_UI_LABEL);
+  zoom.setMin(CameraConstants::ZOOM_MIN);
+  zoom.setMax(CameraConstants::ZOOM_MAX);
+  zoom.setSpeed(CameraConstants::ZOOM_UI_SPEED);
 
-  position.setLabel("position");
-  position.setMin(-100.f);
-  position.setMax(100.f);
-  position.setSpeed(0.1f);
+  position.setLabel(CameraConstants::POSITION_UI_LABEL);
+  position.setMin(CameraConstants::POSITION_MIN);
+  position.setMax(CameraConstants::POSITION_MAX);
+  position.setSpeed(CameraConstants::POSITION_UI_SPEED);
 }
 
 CameraUi::~CameraUi()

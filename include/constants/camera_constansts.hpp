@@ -21,10 +21,29 @@
  */
 namespace CameraConstants
 {
-  constexpr float DEFAULT_YAW = -90.0f;
-  constexpr float DEFAULT_PITCH = 0.0f;
-  constexpr float DEFAULT_ZOOM = 45.0f;
-  constexpr glm::vec3 DEFAULT_POSITION = glm::vec3(0.0f, 0.0f, 3.0f);
+  constexpr float YAW_DEFAULT = -90.0f;
+  constexpr float YAW_MIN = -180.0f;
+  constexpr float YAW_MAX = 80.0f;
+  constexpr float YAW_UI_SPEED = 0.1f;
+  constexpr const char YAW_UI_LABEL[] = "yaw";
+
+  constexpr float PITCH_DEFAULT = 0.0f;
+  constexpr float PITCH_MIN = -89.0f;
+  constexpr float PITCH_MAX = 89.0f;
+  constexpr float PITCH_UI_SPEED = 0.1f;
+  constexpr const char PITCH_UI_LABEL[] = "pitch";
+
+  constexpr float ZOOM_DEFAULT = 45.0f;
+  constexpr float ZOOM_MIN = 1.0f;
+  constexpr float ZOOM_MAX = 45.0f;
+  constexpr float ZOOM_UI_SPEED = 0.1f;
+  constexpr const char ZOOM_UI_LABEL[] = "zoom";
+
+  constexpr glm::vec3 POSITION_DEFAULT = glm::vec3(0.0f, 0.0f, 3.0f);
+  constexpr float POSITION_MIN = -100.0f;
+  constexpr float POSITION_MAX = 100.0f;
+  constexpr float POSITION_UI_SPEED = 0.001f;
+  constexpr const char POSITION_UI_LABEL[] = "position";
 }
 
 #endif // CAMERA_CONSTANTS_HPP
