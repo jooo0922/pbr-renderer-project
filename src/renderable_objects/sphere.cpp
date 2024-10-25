@@ -10,7 +10,7 @@ Sphere::Sphere()
   generateVertexData(vertices, indices);
 
   // 생성된 데이터를 이용하여 Mesh 객체 인스턴스화 (mesh 멤버변수를 스마트 포인터로 관리하는 이유 하단 필기 참고)
-  mesh = std::make_unique<Mesh<SimpleVertexData>>(vertices, indices);
+  mesh = std::make_unique<Mesh<SimpleVertexData>>("sphere", vertices, indices);
 
   // Sphere 렌더링을 위한 추가 작업 수행
   mesh->setDrawMode(GL_TRIANGLE_STRIP);
