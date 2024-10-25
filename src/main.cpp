@@ -1,19 +1,18 @@
-// 행렬 및 벡터 계산에서 사용할 Header Only 라이브러리 include
+#include <memory>
+#include <iostream>
+
+#include <spdlog/spdlog.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "shader/shader.hpp"
 #include "glfw_impl/glfw_impl.hpp"
-#include "renderable_objects/sphere.hpp"
 #include "gl_context/gl_context.hpp"
 
 #include "app/app.hpp"
 #include "ui_manager/ui_manager.hpp"
-
-#include <memory>
-#include <iostream>
-#include <spdlog/spdlog.h>
+#include "model/model.hpp"
 
 int main()
 {
@@ -52,8 +51,8 @@ int main()
 
   /** renderable objects 초기화 */
 
-  // Sphere 객체 생성
-  Sphere sphere;
+  // Model loading 테스트 코드
+  Model monkey("resources/models/monkey/monkey.obj");
 
   glfwImpl.restoreViewport();
 
@@ -86,8 +85,8 @@ int main()
     */
     pbrShader->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
 
-    // 구체 렌더링
-    sphere.draw(*pbrShader);
+    // 로드된 Model 렌더링
+    monkey.draw(*pbrShader);
 
     uiManager.process();
 
