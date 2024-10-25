@@ -44,4 +44,4 @@ private:
   std::vector<TextureData> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
 };
 
-#endif/* MODEL_HPP */
+#endif /* MODEL_HPP */

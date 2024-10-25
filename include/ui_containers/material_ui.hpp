@@ -34,4 +34,4 @@ private:
   ColorEdit albedo;
 };
 
-#endif/* MATERIAL_UI_HPP */
+#endif /* MATERIAL_UI_HPP */

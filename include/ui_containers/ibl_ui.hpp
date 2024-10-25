@@ -31,4 +31,4 @@ private:
   Combo hdrImageSelector;
 };
 
-#endif/* IBL_UI_HPP */
+#endif /* IBL_UI_HPP */
