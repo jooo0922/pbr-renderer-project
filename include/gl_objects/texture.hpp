@@ -19,6 +19,9 @@ class Texture : public IGLObject
 public:
   Texture() = default;
 
+  // 이미지 url 을 로드하여 텍스쳐 객체 생성 (pixel format 자동 설정)
+  Texture(const char *url);
+
   // 이미지 url 을 로드하여 텍스쳐 객체 생성
   Texture(const char *url, GLenum format, GLenum internalFormat);
 
@@ -74,4 +77,4 @@ private:
   GLint magFilter = GL_LINEAR;
 };
 
-#endif // TEXTURE_HPP
+#endif /* TEXTURE_HPP */

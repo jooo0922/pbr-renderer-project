@@ -4,8 +4,69 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
+#include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
+
+Texture::Texture(const char *url)
+{
+  // 텍스쳐 이미지 로드 후, y축 방향으로 뒤집어 줌 > OpenGL 이 텍스쳐 좌표를 읽는 방향과 이미지의 픽셀 좌표가 반대라서!
+  stbi_set_flip_vertically_on_load(true);
+
+  int nrComponents;
+
+  // 이미지 데이터 가져와서 float 타입의 bytes 데이터로 저장.
+  // 이미지 width, height, 색상 채널 변수의 주소값도 넘겨줌으로써, 해당 함수 내부에서 값을 변경. -> 출력변수 역할
+  float *data = stbi_loadf(url, &width, &height, &nrComponents, 0);
+
+  if (data)
+  {
+    // 텍스쳐 객체 생성 및 바인딩
+    glGenTextures(1, &ID);
+
+    bind();
+
+    // 이미지 데이터의 색상 채널 개수에 따라 glTexImage2D() 에 넘겨줄 픽셀 데이터 포맷의 ENUM 값을 결정
+    if (nrComponents == 1)
+    {
+      format = GL_RED;
+      internalFormat = GL_RED;
+    }
+    else if (nrComponents == 3)
+    {
+      format = GL_RGB;
+      internalFormat = GL_RGB;
+    }
+    else if (nrComponents == 4)
+    {
+      format = GL_RGBA;
+      internalFormat = GL_RGBA;
+    }
+
+    /*
+      [0, 1] 범위를 넘어선 HDR 이미지 데이터(data)들을 온전히 저장하기 위해,
+      GL_RGB16F floating point(부동 소수점) 포맷으로 프레임버퍼의 내부 색상 포맷 지정
+      (하단 Floating point framebuffer 관련 필기 참고)
+    */
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, internalFormat, GL_FLOAT, data);
+
+    // 현재 GL_TEXTURE_2D 상태에 바인딩된 텍스쳐 객체 설정하기
+    // Texture Wrapping 모드를 반복 모드로 설정 ([(0, 0), (1, 1)] 범위를 벗어나는 텍스쳐 좌표에 대한 처리)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
+
+    // 텍스쳐 축소/확대 및 Mipmap 교체 시 Texture Filtering (텍셀 필터링(보간)) 모드 설정
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+
+    // 텍스쳐 객체에 이미지 데이터를 전달하고, 밉맵까지 생성 완료했다면, 로드한 이미지 데이터는 항상 메모리 해제할 것!
+    stbi_image_free(data);
+  }
+  else
+  {
+    std::runtime_error("Failed to load image: " + std::string(url));
+  }
+}
 
 Texture::Texture(const char *url, GLenum format, GLenum internalFormat)
     : format(format), internalFormat(internalFormat)
@@ -78,6 +139,7 @@ Texture::Texture(GLsizei width, GLsizei height, GLenum format, GLenum internalFo
 
 Texture::~Texture()
 {
+  spdlog::info("Texture destroyed");
   destroy();
 }
 
