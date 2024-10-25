@@ -1,5 +1,5 @@
-#ifndef MATERIAL_CONSTANTS_HPP
-#define MATERIAL_CONSTANTS_HPP
+#ifndef MATERIAL_CONSTANSTS_HPP
+#define MATERIAL_CONSTANSTS_HPP
 
 /*
   #ifndef ~ #endif 전처리기는
@@ -21,10 +21,27 @@
  */
 namespace MaterialConstants
 {
-  constexpr float DEFAULT_ROUGHNESS = 0.5f;
-  constexpr float DEFAULT_METALLIC = 0.0f;
-  constexpr float DEFAULT_AMBIENT_OCCLUSION = 1.0f; // 각 프래그먼트의 ambient occlusion(환경광 차폐) 기본값을 1로 지정 -> 즉, 환경광이 차폐되는 영역이 없음!
-  constexpr glm::vec3 DEFAULT_ALBEDO = glm::vec3(0.5f, 0.0f, 0.0f);
+  constexpr float ROUGHNESS_DEFAULT = 0.5f;
+  constexpr float ROUGHNESS_MIN = 0.05f; // perfectly smooth surfaces(roughness of 0.0) 은 부자연스러워 보이므로, roughness 최솟값을 0.05 로 설정
+  constexpr float ROUGHNESS_MAX = 1.0f;
+  constexpr float ROUGHNESS_UI_SPEED = 0.001f;
+  constexpr const char ROUGHNESS_UI_LABEL[] = "roughness";
+
+  constexpr float METALLIC_DEFAULT = 0.0f;
+  constexpr float METALLIC_MIN = 0.0f;
+  constexpr float METALLIC_MAX = 1.0f;
+  constexpr float METALLIC_UI_SPEED = 0.001f;
+  constexpr const char METALLIC_UI_LABEL[] = "metallic";
+
+  constexpr float AMBIENT_OCCLUSION_DEFAULT = 1.0f; // 각 프래그먼트의 ambient occlusion(환경광 차폐) 기본값을 1로 지정 -> 즉, 환경광이 차폐되는 영역이 없음!
+  constexpr float AMBIENT_OCCLUSION_MIN = 0.0f;
+  constexpr float AMBIENT_OCCLUSION_MAX = 1.0f;
+  constexpr float AMBIENT_OCCLUSION_UI_SPEED = 0.001f;
+  constexpr const char AMBIENT_OCCLUSION_UI_LABEL[] = "ambientOcclusion";
+
+  constexpr glm::vec3 ALBEDO_DEFAULT = glm::vec3(0.5f, 0.0f, 0.0f);
+  constexpr glm::vec3 ALBEDO_UI_DEFAULT = glm::vec3(1.0f, 1.0f, 1.0f);
+  constexpr const char ALBEDO_UI_LABEL[] = "albedo";
 }
 
-#endif // MATERIAL_CONSTANTS_HPP
+#endif /* MATERIAL_CONSTANSTS_HPP */

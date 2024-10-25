@@ -1,24 +1,25 @@
 #include "ui_containers/material_ui.hpp"
+#include "constants/material_constansts.hpp"
 
 MaterialUi::MaterialUi()
 {
-  roughness.setLabel("roughness");
-  roughness.setMin(0.f);
-  roughness.setMax(1.f);
-  roughness.setSpeed(0.001f);
+  roughness.setLabel(MaterialConstants::ROUGHNESS_UI_LABEL);
+  roughness.setMin(MaterialConstants::ROUGHNESS_MIN);
+  roughness.setMax(MaterialConstants::ROUGHNESS_MAX);
+  roughness.setSpeed(MaterialConstants::ROUGHNESS_UI_SPEED);
 
-  metallic.setLabel("metallic");
-  metallic.setMin(0.f);
-  metallic.setMax(1.f);
-  metallic.setSpeed(0.001f);
+  metallic.setLabel(MaterialConstants::METALLIC_UI_LABEL);
+  metallic.setMin(MaterialConstants::METALLIC_MIN);
+  metallic.setMax(MaterialConstants::METALLIC_MAX);
+  metallic.setSpeed(MaterialConstants::METALLIC_UI_SPEED);
 
-  ambientOcclusion.setLabel("ambientOcclusion");
-  ambientOcclusion.setMin(0.f);
-  ambientOcclusion.setMax(1.f);
-  ambientOcclusion.setSpeed(0.001f);
+  ambientOcclusion.setLabel(MaterialConstants::AMBIENT_OCCLUSION_UI_LABEL);
+  ambientOcclusion.setMin(MaterialConstants::AMBIENT_OCCLUSION_MIN);
+  ambientOcclusion.setMax(MaterialConstants::AMBIENT_OCCLUSION_MAX);
+  ambientOcclusion.setSpeed(MaterialConstants::AMBIENT_OCCLUSION_UI_SPEED);
 
-  albedo.setLabel("albedo");
-  albedo.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+  albedo.setLabel(MaterialConstants::ALBEDO_UI_LABEL);
+  albedo.setColor(MaterialConstants::ALBEDO_UI_DEFAULT);
 }
 
 MaterialUi::~MaterialUi()
