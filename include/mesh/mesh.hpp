@@ -6,14 +6,18 @@
   헤더파일의 헤더가드를 처리하여 중복 include 방지해 줌!
 */
 
+#include <spdlog/spdlog.h>
 #include <glm/glm.hpp>
 #include "shader/shader.hpp"                   // Shader 클래스
 #include "gl_objects/vertex_array_object.hpp"  // VAO 클래스
 #include "gl_objects/vertex_buffer_object.hpp" // VBO 클래스
 #include "gl_objects/index_buffer_object.hpp"  // IBO 클래스
+#include "gl_objects/texture.hpp"
 #include <vector>
 #include <tuple>
 #include <type_traits> // std::is_same_v<> 사용을 위해 포함
+#include <memory>
+#include <string>
 
 #define MAX_BONE_INFLUENCE 4
 
@@ -40,6 +44,7 @@ struct VertexData
 // 텍스처 구조체 선언
 struct TextureData
 {
+  std::shared_ptr<Texture> texturePtr;
   unsigned int id;
   std::string type;
   std::string path;
@@ -67,15 +72,15 @@ public:
   Mesh() {}
 
   // 생성자 override
-  Mesh(const std::vector<VertexDataType> &vertices, const std::vector<unsigned int> &indices, const std::vector<TextureData> &textures)
-      : vertices(vertices), indices(indices), textures(textures)
+  Mesh(const std::string &name, const std::vector<VertexDataType> &vertices, const std::vector<unsigned int> &indices, const std::vector<TextureData> &textures)
+      : name(name), vertices(vertices), indices(indices), textures(textures)
   {
     setupMesh();
   }
 
   // 생성자 override (texture 데이터 미전달)
-  Mesh(const std::vector<VertexDataType> &vertices, const std::vector<unsigned int> &indices)
-      : vertices(vertices), indices(indices)
+  Mesh(const std::string &name, const std::vector<VertexDataType> &vertices, const std::vector<unsigned int> &indices)
+      : name(name), vertices(vertices), indices(indices)
   {
     setupMesh();
   }
@@ -83,6 +88,12 @@ public:
   void setDrawMode(GLenum mode)
   {
     drawMode = mode;
+  }
+
+  // 소멸자 (의도치 않은 소멸자 호출 감지를 위해 console 출력)
+  ~Mesh()
+  {
+    spdlog::info("Mesh <{}> destroyed", name);
   }
 
   // 그리기 함수
@@ -158,6 +169,9 @@ private:
   // draw mode
   GLenum drawMode = GL_TRIANGLES; // 기본값
 
+  // mesh name
+  std::string name;
+
   // 버퍼 설정 함수
   void setupMesh()
   {
@@ -216,4 +230,4 @@ private:
   }
 };
 
-#endif // MESH_HPP
+#endif /* MESH_HPP */
