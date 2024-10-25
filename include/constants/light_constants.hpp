@@ -6,6 +6,7 @@
   헤더파일의 헤더가드를 처리하여 중복 include 방지해 줌!
 */
 
+#include <array>
 #include <glm/glm.hpp>
 
 /**
@@ -22,8 +23,23 @@
 namespace LightConstants
 {
   constexpr std::size_t NUM_LIGHTS = 4;
-  constexpr float DEFAULT_INTENSITY = 300.f;
-  constexpr glm::vec3 DEFAULT_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
+
+  constexpr const char LIGHT_SELECTOR_UI_LABEL[] = "select light";
+
+  constexpr float INTENSITY_DEFAULT = 300.f;
+  constexpr float INTENSITY_MIN = 0.0f;
+  constexpr float INTENSITY_MAX = 1000.0f;
+  constexpr float INTENSITY_UI_SPEED = 0.1f;
+  constexpr const char INTENSITY_UI_LABEL[] = "intensity";
+
+  constexpr float POSITION_MIN = -100.0f;
+  constexpr float POSITION_MAX = 100.0f;
+  constexpr float POSITION_UI_SPEED = 0.1f;
+  constexpr const char POSITION_UI_LABEL[] = "position";
+
+  constexpr glm::vec3 COLOR_DEFAULT = glm::vec3(1.0f, 1.0f, 1.0f);
+  constexpr glm::vec3 COLOR_UI_DEFAULT = glm::vec3(1.0f, 1.0f, 1.0f);
+  constexpr const char COLOR_UI_LABEL[] = "color";
 }
 
-#endif // LIGHT_CONSTANTS_HPP
+#endif /* LIGHT_CONSTANTS_HPP */

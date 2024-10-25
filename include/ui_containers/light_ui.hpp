@@ -41,4 +41,4 @@ private:
   std::array<LightUiSet, LightConstants::NUM_LIGHTS> uiList;
 };
 
-#endif // LIGHT_UI_HPP
+#endif /* LIGHT_UI_HPP */

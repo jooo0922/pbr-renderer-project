@@ -2,23 +2,23 @@
 
 LightUi::LightUi()
 {
-  lightSelector.setLabel("select light");
+  lightSelector.setLabel(LightConstants::LIGHT_SELECTOR_UI_LABEL);
   lightSelector.setItems({"light 1", "light 2", "light 3", "light 4"});
 
   for (unsigned int i = 0; i < uiList.size(); i++)
   {
-    uiList[i].position.setLabel("position");
-    uiList[i].position.setMin(-100.f);
-    uiList[i].position.setMax(100.f);
-    uiList[i].position.setSpeed(0.1f);
+    uiList[i].position.setLabel(LightConstants::POSITION_UI_LABEL);
+    uiList[i].position.setMin(LightConstants::POSITION_MIN);
+    uiList[i].position.setMax(LightConstants::POSITION_MAX);
+    uiList[i].position.setSpeed(LightConstants::POSITION_UI_SPEED);
 
-    uiList[i].color.setLabel("color");
-    uiList[i].color.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+    uiList[i].color.setLabel(LightConstants::COLOR_UI_LABEL);
+    uiList[i].color.setColor(LightConstants::COLOR_UI_DEFAULT);
 
-    uiList[i].intensity.setLabel("intensity");
-    uiList[i].intensity.setMin(0.f);
-    uiList[i].intensity.setMax(1000.f);
-    uiList[i].intensity.setSpeed(0.1f);
+    uiList[i].intensity.setLabel(LightConstants::INTENSITY_UI_LABEL);
+    uiList[i].intensity.setMin(LightConstants::INTENSITY_MIN);
+    uiList[i].intensity.setMax(LightConstants::INTENSITY_MAX);
+    uiList[i].intensity.setSpeed(LightConstants::INTENSITY_UI_SPEED);
   }
 }
 
