@@ -1,4 +1,5 @@
 #include "ui_containers/ibl_ui.hpp"
+#include "constants/ibl_constants.hpp"
 #include <vector>
 
 IBLUi::IBLUi()
@@ -9,17 +10,17 @@ IBLUi::IBLUi()
     hdrImageLabels.push_back(image.label);
   }
 
-  hdrImageSelector.setLabel("select HDR Images");
+  hdrImageSelector.setLabel(IBLConstants::HDR_IMAGE_SELECTOR_UI_LABEL);
   hdrImageSelector.setItems(hdrImageLabels);
 
-  iblVisibility.setLabel("apply IBL");
+  iblVisibility.setLabel(IBLConstants::IBL_VISIBILITY_UI_LABEL);
 
-  skyboxVisibility.setLabel("show environment");
+  skyboxVisibility.setLabel(IBLConstants::SKYBOX_VISIBILITY_UI_LABEL);
 
-  iblIntensity.setLabel("IBL intensity");
-  iblIntensity.setMin(0.f);
-  iblIntensity.setMax(1.f);
-  iblIntensity.setSpeed(0.001f);
+  iblIntensity.setLabel(IBLConstants::IBL_INTENSITY_UI_LABEL);
+  iblIntensity.setMin(IBLConstants::IBL_INTENSITY_MIN);
+  iblIntensity.setMax(IBLConstants::IBL_INTENSITY_MAX);
+  iblIntensity.setSpeed(IBLConstants::IBL_INTENSITY_UI_SPEED);
 }
 
 IBLUi::~IBLUi()

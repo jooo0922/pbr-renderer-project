@@ -14,10 +14,21 @@
  */
 namespace IBLConstants
 {
-  constexpr bool DEFAULT_IBL_VISIBILITY = true;
-  constexpr bool DEFAULT_SKYBOX_VISIBILITY = true;
-  constexpr float DEFAULT_IBL_INTENSITY = 1.0f;
-  constexpr size_t DEFAULT_HDR_IMAGE_INDEX = 0;
+
+  constexpr bool IBL_VISIBILITY_DEFAULT = true;
+  constexpr const char IBL_VISIBILITY_UI_LABEL[] = "apply IBL";
+
+  constexpr bool SKYBOX_VISIBILITY_DEFAULT = true;
+  constexpr const char SKYBOX_VISIBILITY_UI_LABEL[] = "show environment";
+
+  constexpr float IBL_INTENSITY_DEFAULT = 1.0f;
+  constexpr float IBL_INTENSITY_MIN = 0.0f;
+  constexpr float IBL_INTENSITY_MAX = 1.0f;
+  constexpr float IBL_INTENSITY_UI_SPEED = 0.001f;
+  constexpr const char IBL_INTENSITY_UI_LABEL[] = "IBL intensity";
+
+  constexpr size_t HDR_IMAGE_INDEX_DEFAULT = 0;
+  constexpr const char HDR_IMAGE_SELECTOR_UI_LABEL[] = "select HDR Images";
 }
 
 #endif /* IBL_CONSTANTS_HPP */
