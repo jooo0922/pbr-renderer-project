@@ -11,10 +11,10 @@ IBLFeature::IBLFeature()
 void IBLFeature::initialize()
 {
   // IBLUi 에서 관리되는 각 ImGui 요소에 입력할 초기값 설정
-  iblParameter.iblVisibility = IBLConstants::DEFAULT_IBL_VISIBILITY;
-  iblParameter.skyboxVisibility = IBLConstants::DEFAULT_SKYBOX_VISIBILITY;
-  iblParameter.iblIntensity = IBLConstants::DEFAULT_IBL_INTENSITY;
-  iblParameter.hdrImageIndex = IBLConstants::DEFAULT_HDR_IMAGE_INDEX;
+  iblParameter.iblVisibility = IBLConstants::IBL_VISIBILITY_DEFAULT;
+  iblParameter.skyboxVisibility = IBLConstants::SKYBOX_VISIBILITY_DEFAULT;
+  iblParameter.iblIntensity = IBLConstants::IBL_INTENSITY_DEFAULT;
+  iblParameter.hdrImageIndex = IBLConstants::HDR_IMAGE_INDEX_DEFAULT;
 }
 
 void IBLFeature::process()

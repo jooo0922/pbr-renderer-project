@@ -11,10 +11,10 @@ CameraFeature::CameraFeature()
 void CameraFeature::initialize()
 {
   // CameraUi 에서 관리되는 각 ImGui 요소에 입력할 초기값 설정
-  cameraParameter.yaw = CameraConstants::DEFAULT_YAW;
-  cameraParameter.pitch = CameraConstants::DEFAULT_PITCH;
-  cameraParameter.zoom = CameraConstants::DEFAULT_ZOOM;
-  cameraParameter.position = CameraConstants::DEFAULT_POSITION;
+  cameraParameter.yaw = CameraConstants::YAW_DEFAULT;
+  cameraParameter.pitch = CameraConstants::PITCH_DEFAULT;
+  cameraParameter.zoom = CameraConstants::ZOOM_DEFAULT;
+  cameraParameter.position = CameraConstants::POSITION_DEFAULT;
 }
 
 void CameraFeature::process()

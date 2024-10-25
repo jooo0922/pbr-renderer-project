@@ -9,17 +9,17 @@ MaterialFeature::MaterialFeature()
 void MaterialFeature::initialize()
 {
   // MaterialUi 에서 관리되는 각 ImGui 요소에 입력할 초기값 설정
-  materialParameter.roughness = MaterialConstants::DEFAULT_ROUGHNESS;
-  materialParameter.metallic = MaterialConstants::DEFAULT_METALLIC;
-  materialParameter.ambientOcclusion = MaterialConstants::DEFAULT_AMBIENT_OCCLUSION;
-  materialParameter.albedo = MaterialConstants::DEFAULT_ALBEDO;
+  materialParameter.roughness = MaterialConstants::ROUGHNESS_DEFAULT;
+  materialParameter.metallic = MaterialConstants::METALLIC_DEFAULT;
+  materialParameter.ambientOcclusion = MaterialConstants::AMBIENT_OCCLUSION_DEFAULT;
+  materialParameter.albedo = MaterialConstants::ALBEDO_DEFAULT;
 }
 
 void MaterialFeature::process()
 {
   pbrShaderPtr->use();
 
-  pbrShaderPtr->setFloat("roughness", roughness);
+  pbrShaderPtr->setFloat("roughness", glm::clamp(roughness, MaterialConstants::ROUGHNESS_MIN, MaterialConstants::ROUGHNESS_MAX));
   pbrShaderPtr->setFloat("metallic", metallic);
   pbrShaderPtr->setFloat("ao", ambientOcclusion);
   pbrShaderPtr->setVec3("albedo", albedo); // 표면 밖으로 빠져나온 diffuse light 색상값을 쉐이더 프로그램에 전송

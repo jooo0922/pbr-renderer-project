@@ -20,8 +20,8 @@ void LightFeature::initialize()
   for (unsigned int i = 0; i < lightParameter.lightDataArray.size(); i++)
   {
     lightParameter.lightDataArray[i].position = lightPositions[i];
-    lightParameter.lightDataArray[i].color = LightConstants::DEFAULT_COLOR;
-    lightParameter.lightDataArray[i].intensity = LightConstants::DEFAULT_INTENSITY;
+    lightParameter.lightDataArray[i].color = LightConstants::COLOR_DEFAULT;
+    lightParameter.lightDataArray[i].intensity = LightConstants::INTENSITY_DEFAULT;
   }
 }
 
