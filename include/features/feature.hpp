@@ -19,4 +19,4 @@ public:
   virtual void finalize() = 0;
 };
 
-#endif // FEATURE_HPP
+#endif /* FEATURE_HPP */
