@@ -12,6 +12,7 @@ App::~App()
   lightFeature.finalize();
   offscreenRenderingFeature.finalize();
   iblFeature.finalize();
+  modelFeature.finalize();
 }
 
 void App::initialize()
@@ -29,6 +30,7 @@ void App::process()
   lightFeature.process();
   offscreenRenderingFeature.process();
   iblFeature.process();
+  modelFeature.process();
 }
 
 std::shared_ptr<Shader> App::getPbrShader() const
@@ -59,6 +61,11 @@ Controller<LightParameter> &App::getLightController()
 Controller<IBLParameter> &App::getIBLController()
 {
   return iblController;
+}
+
+Controller<ModelParameter> &App::getModelController()
+{
+  return modelController;
 }
 
 void App::initializeShaders()
@@ -99,6 +106,10 @@ void App::initializeFeatures()
   iblFeature.setBackgroundShader(backgroundShader);
   iblFeature.setOffscreenRenderingFeature(&offscreenRenderingFeature);
   iblFeature.initialize();
+
+  // modelFeature 초기화
+  modelFeature.setPbrShader(pbrShader);
+  modelFeature.initialize();
 }
 
 void App::initializeControllers()
@@ -128,4 +139,10 @@ void App::initializeControllers()
   iblFeature.getIBLParameter(iblParameter);
   iblController.addListener(iblFeature);
   iblController.setValue(iblParameter);
+
+  // modelController 객체의 파라미터 값 초기화 및 리스너 등록
+  ModelParameter modelParameter;
+  modelFeature.getModelParameter(modelParameter);
+  modelController.addListener(modelFeature);
+  modelController.setValue(modelParameter);
 }

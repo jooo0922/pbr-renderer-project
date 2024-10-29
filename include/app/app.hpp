@@ -14,6 +14,7 @@
 #include "features/light_feature.hpp"
 #include "features/offscreen_rendering_feature.hpp"
 #include "features/ibl_feature.hpp"
+#include "features/model_feature.hpp"
 
 /**
  * App 클래스
@@ -39,6 +40,7 @@ public:
   Controller<CameraParameter> &getCameraController();
   Controller<LightParameter> &getLightController();
   Controller<IBLParameter> &getIBLController();
+  Controller<ModelParameter> &getModelController();
 
 private:
   void initializeShaders();
@@ -55,12 +57,14 @@ private:
   LightFeature lightFeature;
   OffscreenRenderingFeature offscreenRenderingFeature;
   IBLFeature iblFeature;
+  ModelFeature modelFeature;
 
   // Controllers
   Controller<MaterialParameter> materialController;
   Controller<CameraParameter> cameraController;
   Controller<LightParameter> lightController;
   Controller<IBLParameter> iblController;
+  Controller<ModelParameter> modelController;
 };
 
 #endif // APP_HPP
