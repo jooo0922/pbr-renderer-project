@@ -48,7 +48,6 @@ private:
   ModelParameter modelParameter;
 
   // ImGui 로부터 입력받은 position, rotation, scale 값으로 계산할 모델 행렬
-  // TODO : 생성자 함수의 멤버 초기화 리스트에서 단위 행렬로 초기화할 것.
   glm::mat4 transform;
 
   // Model 인스턴스를 저장할 정적 배열 컨테이너
