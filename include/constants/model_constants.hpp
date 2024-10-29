@@ -29,6 +29,15 @@ namespace ModelConstants
   constexpr std::array<Model, NUM_MODELS> models = {{
       {"Monkey", "resources/models/monkey/monkey.obj"},
   }};
+
+  constexpr glm::vec3 POSITION_DEFAULT = glm::vec3(0.0f, 0.0f, 0.0f);
+
+  // ROTATION 파라미터는 Euler 각을 기준으로 기본값, 최솟값, 최댓값 정의
+  constexpr glm::vec3 ROTATION_DEFAULT = glm::vec3(0.0f, 0.0f, 0.0f);
+
+  constexpr glm::vec3 SCALE_DEFAULT = glm::vec3(1.0f, 1.0f, 1.0f);
+
+  constexpr size_t MODEL_INDEX_DEFAULT = 0;
 }
 
 #endif /* MODEL_CONSTANTS_HPP */
