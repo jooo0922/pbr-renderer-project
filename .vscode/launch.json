@@ -5,14 +5,26 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "(Windows) Launch PBR Renderer",
+      "name": "(Dbg) Launch PBR Renderer",
       "type": "cppvsdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/Debug/pbr_renderer.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
-      "console": "externalTerminal"
+      "console": "externalTerminal",
+      "preLaunchTask": "build-debug"
+    },
+    {
+      "name": "(Run) Launch PBR Renderer",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Release/pbr_renderer.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "console": "externalTerminal",
+      "preLaunchTask": "build-release"
     }
   ]
 }
