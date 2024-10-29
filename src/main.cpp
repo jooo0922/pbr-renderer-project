@@ -2,17 +2,11 @@
 #include <iostream>
 
 #include <spdlog/spdlog.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
-#include "shader/shader.hpp"
 #include "glfw_impl/glfw_impl.hpp"
 #include "gl_context/gl_context.hpp"
-
 #include "app/app.hpp"
 #include "ui_manager/ui_manager.hpp"
-#include "model/model.hpp"
 
 int main()
 {
@@ -43,17 +37,6 @@ int main()
   uiManager.initializeWindow(glfwImpl.getWindow());
   uiManager.initializeUiComponents(app);
 
-  /* PBR 구현에 필요한 쉐이더 객체 생성 및 컴파일 */
-
-  // TODO : App 클래스 내부에서 동적 할당된 각 Shader 객체의 스마트 포인터 참조 -> 각 Shader 관련 코드 리팩토링 완료 시 제거 예정
-  std::shared_ptr<Shader> pbrShader = app.getPbrShader();
-  std::shared_ptr<Shader> backgroundShader = app.getBackgroundShader();
-
-  /** renderable objects 초기화 */
-
-  // Model loading 테스트 코드
-  Model monkey("resources/models/monkey/monkey.obj");
-
   glfwImpl.restoreViewport();
 
   // while 문으로 렌더링 루프 구현
@@ -66,27 +49,6 @@ int main()
     glContext.clear();
 
     app.process();
-
-    /* 각 Sphere 에 적용할 모델행렬 계산 및 Sphere 렌더링 */
-
-    pbrShader->use();
-
-    // 모델행렬을 단위행렬로 초기화
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
-
-    // 계산된 모델행렬을 쉐이더 프로그램에 전송
-    pbrShader->setMat4("model", model);
-
-    /*
-      쉐이더 코드에서 노멀벡터를 World Space 로 변환할 때
-      사용할 노멀행렬을 각 구체의 계산된 모델행렬로부터 계산 후,
-      쉐이더 코드에 전송
-    */
-    pbrShader->setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-
-    // 로드된 Model 렌더링
-    monkey.draw(*pbrShader);
 
     uiManager.process();
 
