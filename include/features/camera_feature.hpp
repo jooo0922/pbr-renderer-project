@@ -57,4 +57,4 @@ private:
   void setPosition(const glm::vec3 &position);
 };
 
-#endif // CAMERA_FEATURE_HPP
+#endif /* CAMERA_FEATURE_HPP */
