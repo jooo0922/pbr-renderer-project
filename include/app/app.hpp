@@ -31,10 +31,6 @@ public:
   void initialize();
   void process();
 
-  // TODO : main.cpp 에서 각 Shader 포인터를 참조하기 위한 임시 getter -> 각 Shader 관련 코드들을 App 안으로 모두 옮긴 후 제거 예정.
-  std::shared_ptr<Shader> getPbrShader() const;
-  std::shared_ptr<Shader> getBackgroundShader() const;
-
   // controller getters
   Controller<MaterialParameter> &getMaterialController();
   Controller<CameraParameter> &getCameraController();
