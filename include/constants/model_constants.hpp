@@ -18,7 +18,7 @@
 
 namespace ModelConstants
 {
-  constexpr std::size_t NUM_MODELS = 1;
+  constexpr std::size_t NUM_MODELS = 3;
 
   struct Model
   {
@@ -28,16 +28,31 @@ namespace ModelConstants
 
   constexpr std::array<Model, NUM_MODELS> models = {{
       {"Monkey", "resources/models/monkey/monkey.obj"},
+      {"Dragon", "resources/models/dragon/dragon.obj"},
+      {"Bunny", "resources/models/bunny/bunny.obj"},
   }};
 
   constexpr glm::vec3 POSITION_DEFAULT = glm::vec3(0.0f, 0.0f, 0.0f);
+  constexpr float POSITION_MIN = -100.0f;
+  constexpr float POSITION_MAX = 100.0f;
+  constexpr float POSITION_UI_SPEED = 0.001f;
+  constexpr const char POSITION_UI_LABEL[] = "position";
 
   // ROTATION 파라미터는 Euler 각을 기준으로 기본값, 최솟값, 최댓값 정의
   constexpr glm::vec3 ROTATION_DEFAULT = glm::vec3(0.0f, 0.0f, 0.0f);
+  constexpr float ROTATION_MIN = -180.0f;
+  constexpr float ROTATION_MAX = 180.0f;
+  constexpr float ROTATION_UI_SPEED = 0.1f;
+  constexpr const char ROTATION_UI_LABEL[] = "rotation";
 
   constexpr glm::vec3 SCALE_DEFAULT = glm::vec3(1.0f, 1.0f, 1.0f);
+  constexpr float SCALE_MIN = 0.1f;
+  constexpr float SCALE_MAX = 10.0f;
+  constexpr float SCALE_UI_SPEED = 0.001f;
+  constexpr const char SCALE_UI_LABEL[] = "scale";
 
   constexpr size_t MODEL_INDEX_DEFAULT = 0;
+  constexpr const char MODEL_SELECTOR_UI_LABEL[] = "select Models";
 }
 
 #endif /* MODEL_CONSTANTS_HPP */
