@@ -33,16 +33,6 @@ void App::process()
   modelFeature.process();
 }
 
-std::shared_ptr<Shader> App::getPbrShader() const
-{
-  return pbrShader;
-}
-
-std::shared_ptr<Shader> App::getBackgroundShader() const
-{
-  return backgroundShader;
-}
-
 Controller<MaterialParameter> &App::getMaterialController()
 {
   return materialController;
