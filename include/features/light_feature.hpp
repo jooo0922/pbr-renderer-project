@@ -1,5 +1,5 @@
-#ifndef DIRECT_LIGHT_FEATURE_HPP
-#define DIRECT_LIGHT_FEATURE_HPP
+#ifndef LIGHT_FEATURE_HPP
+#define LIGHT_FEATURE_HPP
 
 /*
   #ifndef ~ #endif 전처리기는
@@ -60,4 +60,4 @@ private:
   void setIntensity(Light &light, const float &intensity);
 };
 
-#endif // DIRECT_LIGHT_FEATURE_HPP
+#endif /* LIGHT_FEATURE_HPP */
