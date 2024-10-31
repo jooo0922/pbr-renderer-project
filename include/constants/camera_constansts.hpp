@@ -39,7 +39,7 @@ namespace CameraConstants
   constexpr float ZOOM_UI_SPEED = 0.1f;
   constexpr const char ZOOM_UI_LABEL[] = "zoom";
 
-  constexpr glm::vec3 POSITION_DEFAULT = glm::vec3(0.0f, 0.0f, 3.0f);
+  constexpr glm::vec3 POSITION_DEFAULT = glm::vec3(0.0f, 0.0f, 5.0f);
   constexpr float POSITION_MIN = -100.0f;
   constexpr float POSITION_MAX = 100.0f;
   constexpr float POSITION_UI_SPEED = 0.001f;
