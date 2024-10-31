@@ -12,6 +12,7 @@
 #include "ui_containers/camera_ui.hpp"
 #include "ui_containers/light_ui.hpp"
 #include "ui_containers/ibl_ui.hpp"
+#include "ui_containers/model_ui.hpp"
 #include <GLFW/glfw3.h> // 다른 모듈에서 glad.h 를 포함하고 있을 지 모르니, glfw3.h 는 가급적 맨 마지막에 include 할 것.
 
 /**
@@ -41,12 +42,14 @@ private:
   CameraUi cameraUi;
   LightUi lightUi;
   IBLUi iblUi;
+  ModelUi modelUi;
 
   // ImGui 입력 변경 시 호출할 콜백 함수들
   void onChangeMaterialUi();
   void onChangeCameraUi();
   void onChangeLightUi();
   void onChangeIBLUi();
+  void onChangeModelUi();
 };
 
 #endif // UI_MANAGER_HPP
