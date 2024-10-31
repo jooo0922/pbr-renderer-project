@@ -8,18 +8,9 @@ LightFeature::LightFeature()
 void LightFeature::initialize()
 {
   // LightUi 에서 관리되는 각 ImGui 요소에 입력할 초기값 설정
-
-  // 광원 위치값이 담긴 정적 배열 초기화
-  glm::vec3 lightPositions[] = {
-      glm::vec3(-10.0f, 10.0f, 10.0f),
-      glm::vec3(10.0f, 10.0f, 10.0f),
-      glm::vec3(-10.0f, -10.0f, 10.0f),
-      glm::vec3(10.0f, -10.0f, 10.0f),
-  };
-
   for (unsigned int i = 0; i < lightParameter.lightDataArray.size(); i++)
   {
-    lightParameter.lightDataArray[i].position = lightPositions[i];
+    lightParameter.lightDataArray[i].position = LightConstants::lightUiDataArray[i].position;
     lightParameter.lightDataArray[i].color = LightConstants::COLOR_DEFAULT;
     lightParameter.lightDataArray[i].intensity = LightConstants::INTENSITY_DEFAULT;
   }

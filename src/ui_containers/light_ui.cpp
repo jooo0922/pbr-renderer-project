@@ -2,8 +2,14 @@
 
 LightUi::LightUi()
 {
+  std::vector<const char *> lightLabels;
+  for (const auto &lightUiData : LightConstants::lightUiDataArray)
+  {
+    lightLabels.push_back(lightUiData.label);
+  }
+
   lightSelector.setLabel(LightConstants::LIGHT_SELECTOR_UI_LABEL);
-  lightSelector.setItems({"light 1", "light 2", "light 3", "light 4"});
+  lightSelector.setItems(lightLabels);
 
   for (unsigned int i = 0; i < uiList.size(); i++)
   {

@@ -24,6 +24,19 @@ namespace LightConstants
 {
   constexpr std::size_t NUM_LIGHTS = 4;
 
+  struct LightUiData
+  {
+    const char *label;
+    glm::vec3 position;
+  };
+
+  constexpr std::array<LightUiData, NUM_LIGHTS> lightUiDataArray = {{
+      {"light 1", glm::vec3(-10.0f, 10.0f, 10.0f)},
+      {"light 2", glm::vec3(10.0f, 10.0f, 10.0f)},
+      {"light 3", glm::vec3(-10.0f, -10.0f, 10.0f)},
+      {"light 4", glm::vec3(10.0f, -10.0f, 10.0f)},
+  }};
+
   constexpr const char LIGHT_SELECTOR_UI_LABEL[] = "select light";
 
   constexpr float INTENSITY_DEFAULT = 300.f;
