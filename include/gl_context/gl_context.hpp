@@ -63,7 +63,7 @@ private:
   int viewportY = 0;
   int viewportWidth = 0;
   int viewportHeight = 0;
-  glm::vec4 clearColor = glm::vec4(0.2f, 0.3f, 0.3f, 1.0f);
+  glm::vec4 clearColor = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
   GLenum depthFunc = GL_LEQUAL;
 
   // 싱글톤 인스턴스 포인터
