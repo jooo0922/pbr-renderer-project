@@ -127,7 +127,8 @@ GLFWwindow *GLFWImpl::getWindow()
 // GLFWwindow 윈도우 창 리사이징 감지 시, 호출할 콜백 함수 정의
 void GLFWImpl::framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
-  GLContext::getInstance().resize(width, height);
+  // resizing 임시 비활성화
+  // GLContext::getInstance().resize(width, height);
 }
 
 /**
