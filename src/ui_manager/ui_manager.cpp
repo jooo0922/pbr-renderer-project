@@ -1,4 +1,5 @@
 #include "ui_manager/ui_manager.hpp"
+#include "constants/layout_constants.hpp"
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -20,6 +21,10 @@ void UiManager::initializeWindow(GLFWwindow *window)
   // ImGui 플래그 설정
   ImGuiIO &io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+  // ImGui 스타일 설정
+  ImGuiStyle &style = ImGui::GetStyle();
+  style.WindowPadding = ImVec2(LayoutConstants::PANEL_PADDING, LayoutConstants::PANEL_PADDING);
 
   /**
    * ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -77,47 +82,69 @@ void UiManager::process()
   // ImGui 프레임 새로 생성
   ImGui::NewFrame();
 
+  // left panel
+  ImGui::SetNextWindowPos(ImVec2(LayoutConstants::MARGIN, LayoutConstants::MARGIN));
+  ImGui::SetNextWindowSize(ImVec2(LayoutConstants::PANEL_WIDTH, 0.0f));
+  ImGui::Begin("Object Properties", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+  ImGui::Text("Material");
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::TITLE_PADDING));
+  if (materialUi.onUiComponents())
   {
-    // MaterialUi 패널 생성
-    ImGui::Begin("Material");
-    if (materialUi.onUiComponents())
-    {
-      onChangeMaterialUi();
-    }
-    ImGui::End();
-
-    // CameraUi 패널 생성
-    ImGui::Begin("Camera");
-    if (cameraUi.onUiComponents())
-    {
-      onChangeCameraUi();
-    }
-    ImGui::End();
-
-    // LightUi 패널 생성
-    ImGui::Begin("Light");
-    if (lightUi.onUiComponents())
-    {
-      onChangeLightUi();
-    }
-    ImGui::End();
-
-    // IBLUi 패널 생성
-    ImGui::Begin("IBL");
-    if (iblUi.onUiComponents())
-    {
-      onChangeIBLUi();
-    }
-    ImGui::End();
-
-    // ModelUi 패널 생성
-    ImGui::Begin("Model");
-    if (modelUi.onUiComponents())
-    {
-      onChangeModelUi();
-    }
-    ImGui::End();
+    onChangeMaterialUi();
   }
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::PANEL_PADDING));
+
+  ImGui::Separator();
+
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::TITLE_PADDING));
+  ImGui::Text("Model");
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::TITLE_PADDING));
+  if (modelUi.onUiComponents())
+  {
+    onChangeModelUi();
+  }
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::PANEL_PADDING));
+
+  ImGui::Separator();
+
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::TITLE_PADDING));
+  ImGui::Text("Camera");
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::TITLE_PADDING));
+  if (cameraUi.onUiComponents())
+  {
+    onChangeCameraUi();
+  }
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::PANEL_PADDING));
+
+  ImGui::End();
+
+  // right panel
+  ImVec2 windowSize = ImGui::GetIO().DisplaySize;
+  ImGui::SetNextWindowPos(ImVec2(windowSize.x - LayoutConstants::PANEL_WIDTH - LayoutConstants::MARGIN, LayoutConstants::MARGIN));
+  ImGui::SetNextWindowSize(ImVec2(LayoutConstants::PANEL_WIDTH, 0.0f));
+  ImGui::Begin("Lighting & Environment", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+  ImGui::Text("Light");
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::TITLE_PADDING));
+  if (lightUi.onUiComponents())
+  {
+    onChangeLightUi();
+  }
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::PANEL_PADDING));
+
+  ImGui::Separator();
+
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::TITLE_PADDING));
+  ImGui::Text("IBL");
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::TITLE_PADDING));
+  if (iblUi.onUiComponents())
+  {
+    onChangeIBLUi();
+  }
+  ImGui::Dummy(ImVec2(0.0f, LayoutConstants::PANEL_PADDING));
+
+  ImGui::End();
 
   // ImGui 가 렌더링할 drawData 를 모아 둠.
   ImGui::Render();
