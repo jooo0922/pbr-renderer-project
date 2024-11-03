@@ -1,5 +1,6 @@
 #include "features/camera_feature.hpp"
 #include "constants/camera_constansts.hpp"
+#include "constants/layout_constants.hpp"
 
 CameraFeature::CameraFeature()
     : camera(Camera()),
@@ -20,7 +21,7 @@ void CameraFeature::initialize()
 void CameraFeature::process()
 {
   // 카메라의 zoom 값으로부터 투영 행렬 계산
-  glm::mat4 projection = glm::perspective(glm::radians(camera.getCameraZoom()), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+  glm::mat4 projection = glm::perspective(glm::radians(camera.getCameraZoom()), LayoutConstants::WINDOW_WIDTH_DEFAULT / LayoutConstants::WINDOW_HEIGHT_DEFAULT, 0.1f, 100.0f);
 
   // 카메라 클래스로부터 뷰 행렬(= LookAt 행렬) 가져오기
   glm::mat4 view = camera.getViewMatrix();

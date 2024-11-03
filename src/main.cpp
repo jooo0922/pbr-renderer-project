@@ -7,6 +7,7 @@
 #include "gl_context/gl_context.hpp"
 #include "app/app.hpp"
 #include "ui_manager/ui_manager.hpp"
+#include "constants/layout_constants.hpp"
 
 int main()
 {
@@ -14,7 +15,10 @@ int main()
   spdlog::info("Starting the application");
 
   // GLFWImpl 객체 생성
-  GLFWImpl glfwImpl(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME);
+  GLFWImpl glfwImpl(
+      LayoutConstants::WINDOW_WIDTH_DEFAULT,
+      LayoutConstants::WINDOW_HEIGHT_DEFAULT,
+      LayoutConstants::WINDOW_NAME);
 
   // GLFWImpl 초기화
   if (glfwImpl.init() != 0)
