@@ -1,5 +1,5 @@
-#ifndef CAMERA_CONSTANTS_HPP
-#define CAMERA_CONSTANTS_HPP
+#ifndef CAMERA_CONSTANSTS_HPP
+#define CAMERA_CONSTANSTS_HPP
 
 /*
   #ifndef ~ #endif 전처리기는
@@ -43,7 +43,7 @@ namespace CameraConstants
   constexpr float POSITION_MIN = -100.0f;
   constexpr float POSITION_MAX = 100.0f;
   constexpr float POSITION_UI_SPEED = 0.001f;
-  constexpr const char POSITION_UI_LABEL[] = "position";
+  constexpr const char POSITION_UI_LABEL[] = "eye";
 }
 
-#endif // CAMERA_CONSTANTS_HPP
+#endif /* CAMERA_CONSTANSTS_HPP */
