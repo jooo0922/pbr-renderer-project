@@ -10,7 +10,19 @@ set(WINDOW_WIDTH 1280)
 set(WINDOW_HEIGHT 720)
 
 # Visual Studio 컴파일러가 한글 주석이 포함된 소스파일을 UTF-8 로 인코딩하는 옵션을 설정하여 C4819 warning 방지
-add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  # MSVC Compiler
+  add_compile_options("/utf-8")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  # GCC Compiler
+  add_compile_options("-finput-charset=UTF-8" "-fexec-charset=UTF-8")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  # Clang Compiler
+  add_compile_options("-finput-charset=UTF-8" "-fexec-charset=UTF-8")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+  # AppleClang Compiler (macOS)
+  add_compile_options("-finput-charset=UTF-8" "-fexec-charset=UTF-8")
+endif()
 
 # FetchContent 모듈 포함
 include(FetchContent)
