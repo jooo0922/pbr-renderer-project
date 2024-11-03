@@ -4,11 +4,6 @@ cmake_minimum_required(VERSION 3.13)
 set(PROJECT_NAME pbr_renderer)
 set(CMAKE_CXX_STANDARD 17)
 
-# 매크로 변수 설정
-set(WINDOW_NAME "PBR Renderer")
-set(WINDOW_WIDTH 1280)
-set(WINDOW_HEIGHT 720)
-
 # Visual Studio 컴파일러가 한글 주석이 포함된 소스파일을 UTF-8 로 인코딩하는 옵션을 설정하여 C4819 warning 방지
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   # MSVC Compiler
@@ -79,10 +74,3 @@ target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
 # 타겟에 라이브러리 링크
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw spdlog imgui assimp)
-
-# 타겟에 매크로 컴파일 정의
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-  WINDOW_NAME="${WINDOW_NAME}"
-  WINDOW_WIDTH=${WINDOW_WIDTH}
-  WINDOW_HEIGHT=${WINDOW_HEIGHT}
-)
