@@ -32,7 +32,7 @@ namespace OffscreenRenderingConstants
   };
 
   constexpr std::array<HDRImage, NUM_HDR_IMAGES> HDR_IMAGES = {{
-      {"Newport Loft", "resources/textures/hdr/newport_loft.hdr"},
+      {"Warm Restaurant", "resources/textures/hdr/warm_restaurant.hdr"},
       {"Buikslotermeerplein", "resources/textures/hdr/buikslotermeerplein.hdr"},
       {"Evening Road", "resources/textures/hdr/evening_road.hdr"},
       {"Hansaplatz", "resources/textures/hdr/hansaplatz.hdr"},
