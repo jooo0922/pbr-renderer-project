@@ -14,7 +14,7 @@ struct ModelParameter
   glm::vec3 position;
   glm::vec3 rotation; // rotation 파라미터는 Euler 각 기준 인터페이스 정의 -> 내부에서는 Quaternion 으로 계산
   glm::vec3 scale;
-  size_t modelIndex;
+  int modelIndex;
 };
 
 /**
@@ -43,7 +43,7 @@ private:
   glm::vec3 position;
   glm::vec3 rotation;
   glm::vec3 scale;
-  size_t modelIndex;
+  int modelIndex;
 
   ModelParameter modelParameter;
 
@@ -60,7 +60,7 @@ private:
   void setPosition(const glm::vec3 &position);
   void setRotation(const glm::vec3 &rotation);
   void setScale(const glm::vec3 &scale);
-  void setModelIndex(const size_t modelIndex);
+  void setModelIndex(const int modelIndex);
 };
 
 #endif /* MODEL_FEATURE_HPP */

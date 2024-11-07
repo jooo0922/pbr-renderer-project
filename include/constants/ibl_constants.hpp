@@ -27,7 +27,7 @@ namespace IBLConstants
   constexpr float IBL_INTENSITY_UI_SPEED = 0.001f;
   constexpr const char IBL_INTENSITY_UI_LABEL[] = "IBL intensity";
 
-  constexpr size_t HDR_IMAGE_INDEX_DEFAULT = 0;
+  constexpr int HDR_IMAGE_INDEX_DEFAULT = 0;
   constexpr const char HDR_IMAGE_SELECTOR_UI_LABEL[] = "select HDR Images";
 }
 

@@ -12,7 +12,7 @@ struct IBLParameter
   bool iblVisibility;
   bool skyboxVisibility;
   float iblIntensity;
-  size_t hdrImageIndex;
+  int hdrImageIndex;
 };
 
 /**
@@ -45,7 +45,7 @@ private:
   bool iblVisibility;
   bool skyboxVisibility;
   float iblIntensity;
-  size_t hdrImageIndex;
+  int hdrImageIndex;
 
   IBLParameter iblParameter;
 
@@ -53,7 +53,7 @@ private:
   void setIBLVisibility(const bool iblVisibility);
   void setSkyboxVisibility(const bool skyboxVisibility);
   void setIBLIntensity(const float iblIntensity);
-  void setHDRImageIndex(const size_t hdrImageIndex);
+  void setHDRImageIndex(const int hdrImageIndex);
 };
 
 #endif /* IBL_FEATURE_HPP */

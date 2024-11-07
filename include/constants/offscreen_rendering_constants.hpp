@@ -22,8 +22,8 @@
  */
 namespace OffscreenRenderingConstants
 {
-  constexpr std::size_t NUM_CUBE_MAP_FACES = 6;
-  constexpr std::size_t NUM_HDR_IMAGES = 4;
+  constexpr int NUM_CUBE_MAP_FACES = 6;
+  constexpr int NUM_HDR_IMAGES = 4;
 
   struct HDRImage
   {

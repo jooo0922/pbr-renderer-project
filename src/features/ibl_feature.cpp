@@ -110,7 +110,7 @@ void IBLFeature::setIBLIntensity(const float iblIntensity)
   this->iblIntensity = iblIntensity;
 }
 
-void IBLFeature::setHDRImageIndex(const size_t hdrImageIndex)
+void IBLFeature::setHDRImageIndex(const int hdrImageIndex)
 {
   this->hdrImageIndex = hdrImageIndex;
 }

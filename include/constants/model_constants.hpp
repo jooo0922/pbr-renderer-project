@@ -18,7 +18,7 @@
 
 namespace ModelConstants
 {
-  constexpr std::size_t NUM_MODELS = 3;
+  constexpr int NUM_MODELS = 3;
 
   struct Model
   {
@@ -51,7 +51,7 @@ namespace ModelConstants
   constexpr float SCALE_UI_SPEED = 0.001f;
   constexpr const char SCALE_UI_LABEL[] = "scale";
 
-  constexpr size_t MODEL_INDEX_DEFAULT = 0;
+  constexpr int MODEL_INDEX_DEFAULT = 0;
   constexpr const char MODEL_SELECTOR_UI_LABEL[] = "select Models";
 }
 

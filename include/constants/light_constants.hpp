@@ -22,7 +22,7 @@
  */
 namespace LightConstants
 {
-  constexpr std::size_t NUM_LIGHTS = 4;
+  constexpr int NUM_LIGHTS = 4;
 
   struct LightUiData
   {

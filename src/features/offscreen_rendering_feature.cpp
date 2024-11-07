@@ -14,7 +14,7 @@ OffscreenRenderingFeature::OffscreenRenderingFeature()
       backgroundShaderPtr(nullptr)
 {
   /** 각 offscreen rendering 텍스쳐 버퍼 객체 초기화 */
-  for (size_t i = 0; i < OffscreenRenderingConstants::NUM_HDR_IMAGES; i++)
+  for (int i = 0; i < OffscreenRenderingConstants::NUM_HDR_IMAGES; i++)
   {
     /** HDR 이미지 경로 초기화 */
     hdrImages[i] = OffscreenRenderingConstants::HDR_IMAGES[i].path;
@@ -127,7 +127,7 @@ void OffscreenRenderingFeature::setBackgroundShader(std::shared_ptr<Shader> back
   backgroundShaderPtr = backgroundShader;
 }
 
-void OffscreenRenderingFeature::useEnvCubemap(const size_t index)
+void OffscreenRenderingFeature::useEnvCubemap(const int index)
 {
   // envCubemaps 컨테이너에 유효한 인덱스가 아닌 경우 예외 처리
   if (index >= envCubemaps.size())
@@ -139,7 +139,7 @@ void OffscreenRenderingFeature::useEnvCubemap(const size_t index)
   envCubemaps[index]->use(GL_TEXTURE0 + OffscreenRenderingConstants::BackgroundShader::ENVIRONMENT_MAP_UNIT);
 }
 
-void OffscreenRenderingFeature::useIrradianceMap(const size_t index)
+void OffscreenRenderingFeature::useIrradianceMap(const int index)
 {
   // irradianceMaps 컨테이너에 유효한 인덱스가 아닌 경우 예외 처리
   if (index >= irradianceMaps.size())
@@ -151,7 +151,7 @@ void OffscreenRenderingFeature::useIrradianceMap(const size_t index)
   irradianceMaps[index]->use(GL_TEXTURE0 + OffscreenRenderingConstants::PBRShader::IRRADIANCE_MAP_UNIT);
 }
 
-void OffscreenRenderingFeature::usePrefilterMap(const size_t index)
+void OffscreenRenderingFeature::usePrefilterMap(const int index)
 {
   // irradianceMaps 컨테이너에 유효한 인덱스가 아닌 경우 예외 처리
   if (index >= prefilterMaps.size())
@@ -217,13 +217,13 @@ void OffscreenRenderingFeature::generateEnvCubemap()
   captureFBO.bind();
 
   /** 텍스쳐 버퍼가 생성된 컨테이너를 순회하며 Equirectangular HDR 파일 > Cubemap 변환을 위한 offscreen rendering 수행 */
-  for (size_t textureIndex = 0; textureIndex < envCubemaps.size(); textureIndex++)
+  for (int textureIndex = 0; textureIndex < envCubemaps.size(); textureIndex++)
   {
     // HDR 이미지 텍스쳐를 0번 texture unit 에 바인딩해서 사용
     hdrTextures[textureIndex]->use(GL_TEXTURE0 + OffscreenRenderingConstants::EquirectangularToCubemapShader::HDR_TEXTURE_UNIT);
 
     // HDR 이미지가 적용된 단위 큐브의 각 면을 바라보도록 카메라를 회전시키며 6번 렌더링
-    for (size_t faceIndex = 0; faceIndex < OffscreenRenderingConstants::NUM_CUBE_MAP_FACES; faceIndex++)
+    for (int faceIndex = 0; faceIndex < OffscreenRenderingConstants::NUM_CUBE_MAP_FACES; faceIndex++)
     {
       // 쉐이더 객체에 단위 큐브의 각 면을 바라보도록 계산하는 뷰 행렬 전송
       equirectangularToCubemapShader.setMat4("view", captureViews[faceIndex]);
@@ -281,13 +281,13 @@ void OffscreenRenderingFeature::generateIrradianceMap()
   captureFBO.bind();
 
   /** 텍스쳐 버퍼가 생성된 컨테이너를 순회하며 irradiance map 렌더링을 위한 offscreen rendering 수행 */
-  for (size_t textureIndex = 0; textureIndex < irradianceMaps.size(); textureIndex++)
+  for (int textureIndex = 0; textureIndex < irradianceMaps.size(); textureIndex++)
   {
     // HDR 큐브맵 텍스쳐를 0번 texture unit 에 바인딩하여 사용
     envCubemaps[textureIndex]->use(GL_TEXTURE0 + OffscreenRenderingConstants::IrradianceShader::ENVIRONMENT_MAP_UNIT);
 
     // irradiance map 을 렌더링할 단위 큐브의 각 면을 바라보도록 카메라를 회전시키며 6번 렌더링
-    for (size_t faceIndex = 0; faceIndex < OffscreenRenderingConstants::NUM_CUBE_MAP_FACES; faceIndex++)
+    for (int faceIndex = 0; faceIndex < OffscreenRenderingConstants::NUM_CUBE_MAP_FACES; faceIndex++)
     {
       // 쉐이더 객체에 단위 큐브의 각 면을 바라보도록 계산하는 뷰 행렬 전송
       irradianceShader.setMat4("view", captureViews[faceIndex]);
@@ -333,7 +333,7 @@ void OffscreenRenderingFeature::generatePrefilterMap()
   captureFBO.bind();
 
   /** 텍스쳐 버퍼가 생성된 컨테이너를 순회하며 pre-filtered env map 렌더링을 위한 offscreen rendering 수행 */
-  for (size_t textureIndex = 0; textureIndex < prefilterMaps.size(); textureIndex++)
+  for (int textureIndex = 0; textureIndex < prefilterMaps.size(); textureIndex++)
   {
     // HDR 큐브맵 텍스쳐를 0번 texture unit 에 바인딩하여 사용
     envCubemaps[textureIndex]->use(GL_TEXTURE0 + OffscreenRenderingConstants::PrefilterShader::ENVIRONMENT_MAP_UNIT);
@@ -349,8 +349,8 @@ void OffscreenRenderingFeature::generatePrefilterMap()
         mipmap 의 최대 해상도 128 의 2^n 번째 거듭제곱근을 계산하여
         각 mip level 에서 사용할 프레임버퍼와 viewport 의 해상도를 결정함.
       */
-      unsigned int mipWidth = 128 * std::pow(0.5, mip);
-      unsigned int mipHeight = 128 * std::pow(0.5, mip);
+      unsigned int mipWidth = static_cast<unsigned int>(128 * std::pow(0.5, mip));
+      unsigned int mipHeight = static_cast<unsigned int>(128 * std::pow(0.5, mip));
 
       // pre-filtered env map 을 렌더링할 때 사용할 RBO 객체 바인딩
       captureRBO.bind();

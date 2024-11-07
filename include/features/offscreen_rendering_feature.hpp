@@ -37,9 +37,9 @@ public:
   void setBackgroundShader(std::shared_ptr<Shader> backgroundShader);
 
   // 각 텍스쳐 버퍼의 index 를 매개변수로 전달받아 사용할 offscreen rendering 버퍼를 바인딩하는 함수
-  void useEnvCubemap(const size_t index);
-  void useIrradianceMap(const size_t index);
-  void usePrefilterMap(const size_t index);
+  void useEnvCubemap(const int index);
+  void useIrradianceMap(const int index);
+  void usePrefilterMap(const int index);
   void useBRDFLUTTexture();
 
   // 각 primitive getter 함수들

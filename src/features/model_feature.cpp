@@ -8,7 +8,7 @@ ModelFeature::ModelFeature()
       transform(glm::mat4(1.0f))
 {
   /** Model 관련 정적 배열 컨테이너들 초기화 */
-  for (size_t i = 0; i < ModelConstants::NUM_MODELS; i++)
+  for (int i = 0; i < ModelConstants::NUM_MODELS; i++)
   {
     /** 모델링 파일 url 초기화 */
     modelUrls[i] = ModelConstants::models[i].path;
@@ -118,7 +118,7 @@ void ModelFeature::setScale(const glm::vec3 &scale)
   this->scale = scale;
 }
 
-void ModelFeature::setModelIndex(const size_t modelIndex)
+void ModelFeature::setModelIndex(const int modelIndex)
 {
   this->modelIndex = modelIndex;
 }
