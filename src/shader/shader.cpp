@@ -36,7 +36,7 @@ Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
   }
   catch (std::ifstream::failure &e)
   {
-    std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << std::endl;
+    std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << e.what() << std::endl;
   }
 
   // C 스타일 문자열로 변환
