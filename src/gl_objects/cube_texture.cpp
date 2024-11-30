@@ -29,8 +29,8 @@ CubeTexture::CubeTexture(GLsizei width, GLsizei height, GLenum format, GLenum in
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
   // 텍스쳐 축소/확대 및 Mipmap 교체 시 CubeTexture Filtering (텍셀 필터링(보간)) 모드 설정
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, minFilter);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, magFilter);
 }
 
 CubeTexture::~CubeTexture()
